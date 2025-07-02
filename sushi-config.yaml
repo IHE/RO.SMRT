@@ -2,12 +2,12 @@
 # ───────────────────────────────────────────────────
 # the id should be lowercase made up of "ihe." + {domain acronym} + "." + {profile acronym/short-name}
 # e.g. ihe.iti.mhds, or ihe.iti.basicaudit
-id: ihe.domain.profile
-canonical: https://profiles.ihe.net/Domain/Profile
+id: ihe.ro.smrt
+canonical: https://profiles.ihe.net/RO/SMRT
 version: 0.0.1-current
-name: IHE_Domain_Profile
-title: "spelled out name of the IHE Profile"
-description: put the short description of the profile here. it should explain what problem is being solved
+name: IHE_RO_SMRT
+title: "Shared Managament of Radiation Treatments"
+description: Defines the workflow and content necessary to connect any machine-integrated Treatment Management Systems (TMS) with a departmental Radiation Oncology Information System (ROIS) and Hospital-wide Information system (HIS)
 releaseLabel: ci-build
 #releaseLabel: ballot
 #releaseLabel: trial-use
@@ -16,19 +16,19 @@ releaseLabel: ci-build
 status: draft
 publisher:
   ## Find your domain contact on the https://www.ihe.net/ihe_domains page
-  - name: IHE IT Infrastructure Technical Committee
-  - url: https://www.ihe.net/ihe_domains/it_infrastructure/
-  - email: iti@ihe.net
+  - name: IHE Radiation Oncology Technical Committee
+  - url: https://www.ihe.net/ihe_domains/radiation_oncology/
+  - email: jill@aapm.org
 contact:
-  - name: IHE IT Infrastructure Technical Committee
+  - name: IHE Radiation Oncology Technical Committee
     telecom:
       - system: email
-        value: iti@ihe.net
+        value: jill@aapm.org
 license:  CC-BY-4.0
 fhirVersion: 4.0.1
 jurisdiction: 'http://unstats.un.org/unsd/methods/m49/m49.htm#001'
 #copyright: IHE http://www.ihe.net/Governance/#Intellectual_Property
-copyrightYear: 2021+
+copyrightYear: 2025+
 dependencies:
   ihe.iti.balp:
     id: iheitibasicaudit
