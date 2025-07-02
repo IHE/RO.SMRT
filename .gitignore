@@ -9,3 +9,5 @@
 /_gencontinuous.sh
 /_genonce.bat
 /_genonce.sh
+.index.json
+.index.db

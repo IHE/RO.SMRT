@@ -1,0 +1,12 @@
+﻿{
+	"name": "ihe.ro.template",
+	"type": "fhir.template",
+	"license": "CC-BY-1.0",
+	"description": "Temporary IHE RO Template",
+	"author": "http://profiles.ihe.net",
+	"version": "current",
+	"base": "ihe.fhir.template",
+	"dependencies": {
+		"ihe.fhir.template": "current"
+	}
+}
