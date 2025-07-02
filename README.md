@@ -5,4 +5,4 @@ Instructions [are found here](https://github.com/IHE/supplement-template/wiki/Ge
 
 ## CI build
 
-The CI build is available at 
+The CI build is available at https://build.fhir.org/ig/IHE/RO.SMRT/branches/master/index.html
