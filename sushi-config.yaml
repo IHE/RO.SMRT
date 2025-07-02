@@ -7,7 +7,7 @@ canonical: https://profiles.ihe.net/RO/SMRT
 version: 0.0.1-current
 name: IHE_RO_SMRT
 title: "Shared Managament of Radiation Treatments"
-description: Defines the workflow and content necessary to connect any machine-integrated Treatment Management Systems (TMS) with a departmental-wide Radiation Oncology Information System (ROIS) and Hospital-wide Information system (HIS)
+description: Defines the workflow and content necessary to connect any machine-integrated Treatment Management Systems (TMS) with a departmental Radiation Oncology Information System (ROIS) and Hospital-wide Information system (HIS)
 releaseLabel: ci-build
 #releaseLabel: ballot
 #releaseLabel: trial-use
