@@ -3,3 +3,6 @@ This is the supplement template for IHE-Profiles using the IG publisher. reposit
 
 Instructions [are found here](https://github.com/IHE/supplement-template/wiki/Getting-Started)
 
+## CI build
+
+The CI build is available at 
