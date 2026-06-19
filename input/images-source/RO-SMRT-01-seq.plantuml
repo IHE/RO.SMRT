@@ -1,12 +1,44 @@
 @startuml
 skinparam svgDimensionStyle true
 hide footbox
-participant "Requester" as Requester
-participant "Responder" as Responder
-activate Requester
-activate Responder
-Requester -> Responder : 1. Query Treatment Strategy ServiceRequests
-Responder --> Requester : 2. Return Treatment Strategy ServiceRequests Bundle
-deactivate Requester
-deactivate Responder
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
+
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+  GroupBackgroundColor #F0F7FF
+  GroupBorderColor #5D8AA8
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
+
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+participant "Treatment\nManagement System\n(TMS)" as TMS
+participant "Object Store\n(OST)" as OST #F4F6F6
+
+alt Sync by Reference
+  ROIS -[#1A5276]-> TMS : **1a.** Sync Patient Photo [RO-SMRT-01]\n<i>(FHIR message — reference to DICOM SC image)</i>
+  TMS -[#CA6F1E]-> OST : **1b.** Retrieve Patient Photo\n<i>(DICOM C-GET / WADO-RS)</i>
+  OST --[#CA6F1E]--> TMS : <i>Patient Photo (DICOM Secondary Capture)</i>
+  TMS --[#1A5276]--> ROIS : Acknowledgement
+else Sync by Value
+  ROIS -[#1A5276]-> TMS : **1.** Sync Patient Photo [RO-SMRT-01]\n<i>(FHIR message — Base64-encoded image)</i>
+  TMS --[#1A5276]--> ROIS : Acknowledgement
+end
+
+note over ROIS, OST
+  The TMS stores the photo and displays it for
+  patient identity verification at the treatment device.
+end note
 @enduml

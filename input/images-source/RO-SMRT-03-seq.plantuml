@@ -1,0 +1,35 @@
+@startuml
+skinparam svgDimensionStyle true
+hide footbox
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
+
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
+
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+participant "Treatment\nManagement System\n(TMS)" as TMS
+
+ROIS -[#1A5276]-> TMS : **1.** Report Treatment Approval [RO-SMRT-03]\n<i>(FHIR message)</i>
+TMS -> TMS : **2.** Add approval to plan
+TMS --[#1A5276]--> ROIS : Acknowledgement
+
+note over ROIS, TMS
+  The ROIS acts as the gatekeeper for treatment delivery.
+  Approval must be recorded before treatment proceeds.
+end note
+@enduml

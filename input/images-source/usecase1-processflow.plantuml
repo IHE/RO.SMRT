@@ -1,42 +1,91 @@
 @startuml
 skinparam svgDimensionStyle true
 hide footbox
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
 
-actor "Clerk" as Clerk
-actor "Physician" as Physician
-actor "Planner" as Planner
-actor "Therapist" as Therapist
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+  DividerBackgroundColor #E8EEF4
+  DividerBorderColor #7F8C8D
+  DividerFontStyle bold
+  DividerFontColor #333333
+  GroupBackgroundColor #F0F7FF
+  GroupBorderColor #5D8AA8
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
 
-participant "Treatment Managament System" as TMS
-participant "RO Resource Repo" as REPO
-participant "Radiation Oncology Information System" as ROIS
-participant "Archive" as ARCH
+participant "Hospital\nInformation\nSystem (HIS)" as HIS #F4F6F6
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+participant "Treatment\nManagement\nSystem (TMS)" as TMS
+participant "Object Store\n(OST)" as OST #F4F6F6
 
-activate "TMS"
-activate "ROIS"
-Clerk -> ROIS : //Register patient//
-Physician -> ROIS : //Enter diagnosis//
-TMS -> REPO : Query Patient [[RO-SMRT-xx.html RO-SMRT-xx]]
-TMS -> REPO : Query Treatment Strategy [[RO-SMRT-01.html RO-SMRT-01]]
-TMS -> REPO : Query Diagnosis [[RO-SMRT-xx.html RO-SMRT-xx]]
-Planner -> TMS : //Do detailed planning//
-Planner -> TMS : //Approve plan//
-TMS -> REPO : Report Planning Summary [[RO-SMRT-xx.html RO-SMRT-xx]]
-Physician -> ROIS : //Approve plan//
-ROIS -> REPO : Report Plan Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-Planner -> TMS : //Prepare plan for delivery//
-Planner -> TMS : //Approbe plan for delivery//
-TMS -> REPO : Report Treatment Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-Clerk -> ROIS : //Schedule appointments//
-ROIS -> REPO : Appointments scheduled [[RO-SMRT-xx.html RO-SMRT-xx]]
-Therapist -> TMS : //Start treatment session//
-TMS -> REPO : Report Treatment Session Status [[RO-SMRT-xx.html RO-SMRT-xx]]
-Therapist -> TMS : //Perform treatment session//
-Therapist -> TMS : //Close treatment session//
-TMS -> REPO : Report Treatment Session Status [[RO-SMRT-xx.html RO-SMRT-xx]]
-TMS -> REPO : Report Treatment Session Details [[RO-SMRT-xx.html RO-SMRT-xx]]
-Physician -> TMS : //Review and approve treatment session//
-TMS -> REPO : Report Treatment Session Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-deactivate "TMS"
-deactivate "ROIS"
+== Patient Registration ==
+HIS -[#95A5A6]-> ROIS : <i><color:#95A5A6>Sync Patient Demographics: HL7v2 ADT</color></i>
+ROIS -> ROIS : Assign Patient to TMS
+ROIS -[#95A5A6]-> TMS : <i><color:#95A5A6>Sync Patient Demographics [ITI-30]</color></i>
+alt Photo by reference
+  ROIS -[#1A5276]-> TMS : **Sync Patient Photo [RO-SMRT-01]**\n<i>(FHIR message — reference to DICOM SC image)</i>
+  TMS -[#CA6F1E]-> OST : <i><color:#CA6F1E>Retrieve Patient Photo (DICOM)</color></i>
+else Photo by value
+  ROIS -[#1A5276]-> TMS : **Sync Patient Photo [RO-SMRT-01]**\n<i>(FHIR message — Base64-encoded image)</i>
+end
+opt
+  ROIS -[#95A5A6]-> TMS : <i><color:#95A5A6>Sync Treatment Encounter [ITI-31]</color></i>
+end
+
+== Appointment Scheduling ==
+ROIS -> ROIS : Schedule Treatment Appointments
+ROIS -[#95A5A6]-> TMS : <i><color:#95A5A6>Sync Treatment Appointment: HL7v2 SIU</color></i>
+
+== Treatment Planning ==
+opt Support Prescription Option (beyond MVP)
+  ROIS -> ROIS : Create Prescription
+  TMS -[#95A5A6]-> ROIS : <i><color:#95A5A6>Retrieve Prescription Summary [XRTS-08]</color></i>
+end
+TMS -> TMS : Import & Approve Plan; Enrich Plan
+TMS -[#1A5276]-> ROIS : **Report Planning Artifacts [RO-SMRT-02]**\n<i>(FHIR — refs DICOM: RT Plan, [CT, RT Structure Set, RT Dose])</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+ROIS -[#CA6F1E]-> OST : <i><color:#CA6F1E>Retrieve Planning Artifacts (DICOM)</color></i>
+
+== Treatment Approval ==
+ROIS -> ROIS : Approve Treatment
+ROIS -[#1A5276]-> TMS : **Report Treatment Approval [RO-SMRT-03]**\n<i>(FHIR message)</i>
+TMS -> TMS : Add Approval to Plan
+TMS --[#1A5276]--> ROIS : Acknowledgement
+TMS -[#1A5276]-> ROIS : **Report Planning Artifacts [RO-SMRT-02]**\n<i>(final delivery plan)</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+ROIS -[#CA6F1E]-> OST : <i><color:#CA6F1E>Retrieve Final Delivery Plan (DICOM)</color></i>
+
+== Treatment Delivery ==
+ROIS -[#95A5A6]-> TMS : <i><color:#95A5A6>Report Patient Check-in: HL7v2 SIU</color></i>
+TMS -> TMS : Deliver Treatment
+
+== Report Treatment Artifacts ==
+TMS -[#1A5276]-> ROIS : **Report Treatment Artifacts [RO-SMRT-04]**\n<i>(FHIR — refs DICOM: RT Record, RT Structure Set, CT, RT Dose)</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+ROIS -[#CA6F1E]-> OST : <i><color:#CA6F1E>Retrieve Treatment Artifacts (DICOM)</color></i>
+ROIS -> ROIS : Track Treatment Progress
+
+== Post-Treatment ==
+alt Image review at TMS
+  TMS -[#1A5276]-> ROIS : **Report Image Review Results [RO-SMRT-05]**\n<i>(FHIR message)</i>
+  ROIS --[#1A5276]--> TMS : Acknowledgement
+else Image review at ROIS
+  ROIS -> ROIS : Review Images
+end
+ROIS -[#95A5A6]-> HIS : <i><color:#95A5A6>Share Treatment Summary (XRTS / HL7v2 ORU)</color></i>
+ROIS -[#95A5A6]-> HIS : <i><color:#95A5A6>Billing (HL7v2 DFT)</color></i>
 @enduml

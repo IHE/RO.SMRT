@@ -1,11 +1,15 @@
 
-The Shared Managament of Radiation Therapy (SMRT) Profile defines the workflow and content necessary to connect any machine-integrated Treatment Planning and Management System (TPMS) with a departmental Radiation Oncology Information System (ROIS).
+In contemporary radiation oncology clinics, a single Radiation Oncology Information System (ROIS) is deployed to manage the electronic medical records (EMR) for all patients. This centralized system is used by radiation oncologists and departmental staff to prescribe, schedule, and track the complete course of treatment for each patient.
 
-There is a need to be able to incorporate “island” treatment devices into a larger, departmental Radiation Oncology Information System (ROIS). Such "island" treatment devices often come with their local TPMS fully tailored to the capabilities of that treatment device. The Oncology department needs to be able to schedule, review and track treatment progress for these devices as they do for the other standard treatment devices of their treatment device fleet.
+For an optimal workflow, all treatment devices should be interfaced with the ROIS to enable scheduling, prescription management, and treatment progress monitoring to be performed directly within that single, centralized system.
 
-This profile provides the mechanisms to exchange the required treatment planning and treatment delivery artefcats to support beforementioned scenarios and to allow a holistioc view of the on-going treatments in the ROIS.
+While some treatment devices can be managed by a Treatment Management System (TMS) integrated with the ROIS via the IHE-RO TDW-II profile, many others interface exclusively with a device-specific TMS or contain an integrated TMS. This is increasingly common with the emergence of treatment devices for novel techniques like Online Adaptive Radiation Therapy (OART), which utilizes imaging such as CBCT, CT, or MRI, and PET-based Dose-Guided Radiation Therapy (DGRT), which often bundle the TMS, Treatment Planning System (TPS), and Treatment Delivery Device (TDD) actors.
 
-**TODO: Explicitly state whether this is a Workflow, Transport, or Content Module (or combination) profile. See the IHE Technical Frameworks General Introduction for definitions of these profile types. The IHE Technical Frameworks [General Introduction](https://profiles.ihe.net/GeneralIntro/). **
+These standalone treatment devices are frequently disconnected from the departmental ROIS, creating isolated "islands" where treatments must be scheduled and tracked separately. This forces staff to rely on inefficient and error-prone workarounds, such as manual data entry or ad-hoc software bridges. Integrating these devices into the main ROIS is therefore essential to provide the same unified scheduling, review, and tracking capabilities available for the standard treatment device fleet.
+
+The SMRT Profile provides the necessary mechanisms for exchanging scheduling, planning, and treatment delivery artifacts to support these scenarios, thereby enabling a holistic and unified view of all ongoing treatments within the ROIS.
+
+This profile is a **Workflow and Content** profile. See the IHE Technical Frameworks [General Introduction](https://profiles.ihe.net/GeneralIntro/) for definitions of these profile types.
 
 <a name="actors-and-transactions"> </a>
 
@@ -16,548 +20,228 @@ definitions of actors are given in the Technical Frameworks General Introduction
 IHE Transactions can be found in the Technical Frameworks General Introduction [Appendix B](https://profiles.ihe.net/GeneralIntro/ch-B.html).
 Both appendices are located at <https://profiles.ihe.net/GeneralIntro/>.
 
-Figure below shows the actors directly involved in the SMRT Profile and the relevant transactions between them. If needed for context, other actors that may be indirectly involved due to their participation
-in other related profiles are shown in dotted lines.
+The SMRT Profile defines two actors — the **Radiation Oncology Information System (ROIS)** and the **Treatment Management System (TMS)** — and a small set of FHIR-message transactions between them. To synchronize patient identity, encounters, scheduling, prescription, and imaging artifacts, SMRT **reuses established IHE transactions and standards** (IHE-ITI Patient Administration Management, IHE-RO XRTS, HL7 V2 scheduling, and DICOM) by grouping rather than by defining new transactions. An object store (OST) from which DICOM artifacts are retrieved, and the Hospital Information System (HIS), are external to this profile and shown for context.
 
 <figure>
 {% include ActorsAndTransactions.svg max-width="200px" %}
-<figcaption><strong>Figure XX.1-2: SMRT Actor Diagram</strong></figcaption>
+<figcaption><strong>Figure X.1-1: SMRT Actor Diagram</strong></figcaption>
 </figure>
 <br clear="all"/>
 
-<p id ="tXX.1-1" class="tableTitle"><strong>Table XX.1-1: SMRT Profile - Actors and Transactions</strong></p>
+### X.1.1 SMRT Transactions
 
-| Actors  | Transactions                         | Initiator or Responder | Optionality     | Reference                                  |
-|---------|--------------------------------------|------------------------|-----------------|--------------------------------------------|
-| ROIS    | RO-SMRT-01 Query Treatment Strategy  | Responder              | R (Note 1)      | [Domain Acronym TF-2: 3.Y1](./domain-Y1.html) |
-|         | RO-SMRT-02 Query Diagnosis           | Responder              | R               | [Domain Acronym TF-2: 3.Y2](./domain-Y2.html) |
-| TMS     | RO-SMRT-01 Query Treatment Strategy  | Initiator              | R               | [Domain Acronym TF-2: 3.Y1](./domain-Y1.html) |
-|         | RO-SMRT-02 Query Diagnosis           | Initiator              | R               | [Domain Acronym TF-2: 3.Y2](./domain-Y2.html) |
+The transactions newly defined by this profile are FHIR-message transactions exchanged between the ROIS and the TMS, listed in Table X.1-1.
+
+<p id ="tX.1-1" class="tableTitle"><strong>Table X.1-1: SMRT Profile - Actors and Transactions (defined by this profile)</strong></p>
+
+| Actors  | Transactions                            | Initiator or Responder | Optionality | Reference     |
+|---------|-----------------------------------------|------------------------|-------------|---------------|
+| ROIS    | Sync Patient Photo [RO-SMRT-01]         | Initiator              | R           | RO TF-2: 3.Y1 |
+|         | Report Planning Artifacts [RO-SMRT-02]  | Responder              | R           | RO TF-2: 3.Y2 |
+|         | Report Treatment Approval [RO-SMRT-03]  | Initiator              | R           | RO TF-2: 3.Y3 |
+|         | Report Treatment Artifacts [RO-SMRT-04] | Responder              | R           | RO TF-2: 3.Y4 |
+|         | Report Image Review Results [RO-SMRT-05]| Responder              | O           | RO TF-2: 3.Y5 |
+| TMS     | Sync Patient Photo [RO-SMRT-01]         | Responder              | R           | RO TF-2: 3.Y1 |
+|         | Report Planning Artifacts [RO-SMRT-02]  | Initiator              | R           | RO TF-2: 3.Y2 |
+|         | Report Treatment Approval [RO-SMRT-03]  | Responder              | R           | RO TF-2: 3.Y3 |
+|         | Report Treatment Artifacts [RO-SMRT-04] | Initiator              | R           | RO TF-2: 3.Y4 |
+|         | Report Image Review Results [RO-SMRT-05]| Initiator              | O           | RO TF-2: 3.Y5 |
 {: .grid}
 
-Note 1: *For example, a note could specify that at least one of the
-transactions shall be supported by an actor or other variations. For
-example: Note: Either Transaction Y3 or Transaction Y4 shall be
-implemented for Actor E.*
+To complete the workflow, SMRT actors are grouped with actors of other profiles and exchange the transactions listed in Table X.1-2. These are **not** defined by this profile; they are reused as-is.
 
-Note 2: *For example, could specify that Transaction Y4 is required
-if Actor B supports XYZ Option, see Section XX.3.X.*
+<p id ="tX.1-2" class="tableTitle"><strong>Table X.1-2: SMRT Profile - Reused Transactions and Standards (via grouping)</strong></p>
 
-### XX.1.1 Actors
-The actors in this profile are described in more detail in the sections below.
+| Exchange                                  | Standard / Transaction                                                | Direction   |
+|-------------------------------------------|-----------------------------------------------------------------------|-------------|
+| Sync Patient Demographics                 | HL7 V2 ADT — IHE-ITI Patient Identity Management [ITI-30]              | ROIS → TMS  |
+| Sync Treatment Encounter (optional)       | HL7 V2 ADT — IHE-ITI Patient Encounter Management [ITI-31]            | ROIS → TMS  |
+| Sync Treatment Appointment                | HL7 V2 SIU (scheduling)                                                | ROIS → TMS  |
+| Report Patient Check-in                   | HL7 V2 SIU (scheduling)                                                | ROIS ↔ TMS  |
+| Retrieve Prescription Summary (option)    | IHE-RO XRTS [XRTS-08] — see [Support Prescription Option](#actor-options) | TMS → ROIS  |
+| Retrieve Patient Photo / Planning / Treatment Artifacts | DICOM C-MOVE / C-GET / QIDO-RS / WADO-RS                  | ROIS/TMS → OST |
+{: .grid}
+
+> **Editor's Note (provisional):** The transaction names, identifiers (RO-SMRT-0x), section references, and groupings are provisional and subject to assignment by the IHE-RO Technical Committee. The specific grouping for HL7 V2 SIU scheduling/check-in, and the definition of the object store (OST) actor, are open issues. See the [Open Issues](issues.html). This profile follows the SMRT Phase 1 (MVP) scope per the Shanghai F2F sequence diagram.
+
+### X.1.2 Actors
 
 <a name="radiation-oncology-information-system"> </a>
 
-#### XX.1.1.1 Radiation Oncology Information System (ROIS)
+#### X.1.2.1 Radiation Oncology Information System (ROIS)
 
-The Client queries for blah meeting certain criteria and may retrieve selected blah.
+The Radiation Oncology Information System (ROIS) is the single, centralized departmental system that manages the electronic medical record for all patients and maintains the authoritative record of each patient's treatment course. In this profile the ROIS is responsible for:
 
-FHIR Capability Statement for [ROIS](CapabilityStatement-IHE.SMRT.rois.html)
+- **Patient and Schedule Management** — synchronizing patient demographics (via [ITI-30]), encounters (via [ITI-31]), the patient photo (Sync Patient Photo [RO-SMRT-01]), and appointment information (HL7 V2 SIU) with the TMS to prepare it for the treatment workflow.
+- **Treatment Approval** — serving as the system where clinical approval for treatment is given and communicating that authorization to the TMS (Report Treatment Approval [RO-SMRT-03]), acting as the gatekeeper for proceeding with treatment delivery.
+- **Artifact Consolidation and Oversight** — providing a centralized point of access to treatment-related artifacts; receiving notifications from the TMS when planning and treatment delivery artifacts are available (Report Planning Artifacts [RO-SMRT-02], Report Treatment Artifacts [RO-SMRT-04]), selectively retrieving them from the object store via DICOM, and optionally serving as the long-term archive for retrieved data.
+
+Requirements CapabilityStatement for [ROIS](CapabilityStatement-IHE.SMRT.rois.html).
 
 <a name="treatment-management-system"> </a>
 
-#### XX.1.1.2 Treatment Management System (TMS)
+#### X.1.2.2 Treatment Management System (TMS)
 
-The Sever processes query request from the Client actor.
+The Treatment Management System (TMS) is a device-specific subsystem for treatment execution. It coordinates the treatment planning activities and the detailed management of the delivery of treatment sessions on its associated device(s). It reports the status and results of these activities back to the ROIS (Report Planning Artifacts [RO-SMRT-02], Report Treatment Artifacts [RO-SMRT-04], and optionally Report Image Review Results [RO-SMRT-05]), thereby contributing to the patient's authoritative treatment course record. A TMS may be a standalone system or may be integrated with (or embedded in) a treatment device that also bundles the Treatment Planning System (TPS) and Treatment Delivery Device (TDD).
 
-FHIR Capability Statement for [TMS](CapabilityStatement-IHE.SMRT.tms.html)
+Requirements CapabilityStatement for [TMS](CapabilityStatement-IHE.SMRT.tms.html).
 
-<a name="ro-resource-repo"> </a>
+### X.1.3 Transaction Descriptions
 
-#### XX.1.1.3 Radiation Oncology Resource Repository (REPO)
+The transactions defined by this profile are summarized below. Detailed transaction definitions appear in Volume 2.
 
-The Client queries for blah meeting certain criteria and may retrieve selected blah.
-
-FHIR Capability Statement for [REPO](CapabilityStatement-IHE.SMRT.repo.html)
-
-### XX.1.2 Transaction Descriptions
-
-The transactions in this profile are summarized in the sections below.
-
-#### XX.1.2.1 Query Treatment Strategy ToDo do transaction
-
-This transaction is used to **do things**
-
-For more details see the detailed [transaction description](RO-SMRT-01.html)
+- **Sync Patient Photo [RO-SMRT-01]** — the ROIS sends the patient photo to the TMS in a FHIR message, either by value (Base64-encoded image) or by reference to a DICOM Secondary Capture (SC) image that the TMS subsequently retrieves.
+- **Report Planning Artifacts [RO-SMRT-02]** — the TMS notifies the ROIS, in a FHIR message that references DICOM RT objects, that treatment planning artifacts (principally the RT Plan) are ready for retrieval. This transaction is also used after approval to report that the final delivery plan is ready.
+- **Report Treatment Approval [RO-SMRT-03]** — the ROIS sends the treatment approval to the TMS in a FHIR message, authorizing delivery.
+- **Report Treatment Artifacts [RO-SMRT-04]** — when a treatment session is complete, the TMS notifies the ROIS, in a FHIR message that references DICOM RT objects (RT Record, RT Structure Set, CT, RT Dose), that treatment artifacts are ready for retrieval.
+- **Report Image Review Results [RO-SMRT-05]** — when image review is performed at the TMS, the TMS reports the image review results to the ROIS in a FHIR message.
 
 <a name="actor-options"> </a>
 
-## XX.2 SMRT Actor Options
+## X.2 SMRT Actor Options
 
-Options that may be selected for each actor in this implementation guide, are listed in Table XX.2-1 below. Dependencies
-between options when applicable are specified in notes.
+Options that may be selected for each actor in this profile are listed in Table X.2-1 below.
 
-<p id ="tXX.2-1" class="tableTitle"><strong>Table XX.2-1: Actor Options</strong></p>
+<p id ="tX.2-1" class="tableTitle"><strong>Table X.2-1: SMRT - Actors and Options</strong></p>
 
-| Actor   | Option Name |
-|---------|-------------|
-| Actor A | Option AB  |
-| Actor B | none |
+| Actor | Option Name                  | Reference     |
+|-------|------------------------------|---------------|
+| ROIS  | Support Prescription Option  | Section X.2.1 |
+| TMS   | Support Prescription Option  | Section X.2.1 |
 {: .grid}
 
-### XX.2.1 AB Option
+### X.2.1 Support Prescription Option
 
-**TODO: describe this option and the Volume 1 requirements for this option
+The Support Prescription Option enables the direct exchange of high-level prescription information between the ROIS and the TMS, beyond the minimum (MVP) demographics, scheduling, and artifact-reporting workflow. An actor that supports this option shall support the **Retrieve Prescription Summary [XRTS-08]** transaction of the IHE-RO XRTS profile (the ROIS as Responder, the TMS as Initiator); see Table X.1-2.
 
 <a name="required-groupings"> </a>
 
-## XX.3 SMRT Required Actor Groupings
+## X.3 SMRT Required Actor Groupings
 
-*Describe any requirements for actors in this profile to be grouped
-with other actors.*
+An actor from this profile (Column 1) shall implement all of the required transactions and/or content modules in this profile ***in addition to*** all of the requirements for the grouped actor (Column 2).
 
-*This section specifies all REQUIRED Actor Groupings (although
-"required" sometimes allows for a selection of one of several). To
-SUGGEST other profile groupings or helpful references for other profiles
-to consider, use Section XX.6 Cross Profile Considerations. Use Section
-X.5 for security profile recommendations.*
+To synchronize patient identity, encounters, scheduling, prescription, and imaging artifacts, the SMRT actors are grouped with actors of other profiles. The SMRT actors also exchange protected health information and therefore require the security and time groupings common to IHE profiles. The IHE-RO Technical Committee will confirm the final set of required groupings during ballot; the groupings below are the expected baseline.
 
-An actor from this profile (Column 1) shall implement all of the
-required transactions and/or content modules in this profile ***in
-addition to*** ***<u>all</u>*** of the requirements for the grouped
-actor (Column 2) (Column 3 in alternative 2).
+<p id ="tX.3-1" class="tableTitle"><strong>Table X.3-1: SMRT - Required Actor Groupings</strong></p>
 
-If this is a content profile, and actors from this profile are grouped
-with actors from a workflow or transport profile, the Reference column
-references any specifications for mapping data from the content module
-into data elements from the workflow or transport transactions.
+| SMRT Actor | Grouping Condition | Actor(s) to be grouped with | Reference |
+|------------|--------------------|-----------------------------|-----------|
+| ROIS | Required | IHE-ITI PAM / Patient Demographics Supplier (or equivalent ADT source) | ITI TF-1: 14 |
+| ROIS | With Support Prescription Option | IHE-RO XRTS actor for [XRTS-08] | IHE-RO XRTS |
+| ROIS | Required | a DICOM artifact source / object store (OST) | DICOM |
+| ROIS | Required | ITI CT / Time Client | ITI TF-1: 7 |
+| ROIS | Required | ITI ATNA / Secure Node or Secure Application | ITI TF-1: 9 |
+| TMS  | Required | IHE-ITI PAM / Patient Demographics Consumer (or equivalent ADT consumer) | ITI TF-1: 14 |
+| TMS  | With Support Prescription Option | IHE-RO XRTS actor for [XRTS-08] | IHE-RO XRTS |
+| TMS  | Required | ITI CT / Time Client | ITI TF-1: 7 |
+| TMS  | Required | ITI ATNA / Secure Node or Secure Application | ITI TF-1: 9 |
+{: .grid}
 
-In some cases, required groupings are defined as at least one of an
-enumerated set of possible actors; this is designated by merging column
-one into a single cell spanning multiple potential grouped actors. Notes
-are used to highlight this situation.
-
-Section XX.5 describes some optional groupings that may be of interest
-for security considerations and Section XX.6 describes some optional
-groupings in other related profiles.
-
-Two alternatives for Table XX.3-1 are presented below.
-
-* If there are no required groupings for any actor in this profile,
-    use alternative 1 as a template.
-* If an actor in this profile (with no option), has a required
-    grouping, use alternative 1.
-* If any required grouping is associated with an actor/option
-    combination in this profile, use alternative 2.
-
-alternative 1 Table XX.3-1: Profile Name - Required Actor
-Groupings
-
-All actors from this profile should be listed in Column 1, even if
-none of the actors has a required groupings. If no required grouping
-exists, "None" should be indicated in Column 2. If an actor in a content
-profile is required to be grouped with an actor in a transport or
-workflow profile, it will be listed **with at least one** required
-grouping. Do not use "XD\*" as an actor name.
-
-In some cases, required groupings are defined as at least one of an
-enumerated set of possible actors; to designate this, create a row for
-each potential actor grouping and merge column one to form a single cell
-containing the profile actor which should be grouped with at least one
-of the actors in the spanned rows. In addition, a note should be
-included to explain the enumerated set. See example below showing
-Document Consumer needing to be grouped with at least one of XDS.b
-Document Consumer, XDR Document Recipient or XDM Portable Media
-Importer
-
-The author should pay special consideration to security profiles in
-this grouping section. Consideration should be given to Consistent Time
-(CT) Client, ATNA Secure Node or Secure Application, as well as other
-profiles. For the sake of clarity and completeness, even if this table
-begins to become long, a line should be added for each actor for each of
-the required grouping for security. Also see the ITI document titled
-'Cookbook: Preparing the IHE Profile Security Section' at
-<http://ihe.net/Technical_Frameworks/#IT> for a list of suggested IT and
-security groupings.
-
-<p id ="tXX.3-1" class="tableTitle"><strong>Table XX.3-1: Actor Groupings</strong></p>
-
-<table border="1" borderspacing="0" style='border: 1px solid black; border-collapse: collapse'>
-<thead>
-<tr class="header">
-<th>this Profile Acronym Actor</th>
-<th>Actor(s) to be grouped with</th>
-<th>Reference</th>
-<th>Content Bindings Reference</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Actor A</td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym/Actor</em></p>
-<p><em>e.g., ITI CT / Time Client</em></p></td>
-<td><p><em>TF Reference; typically from Vol 1</em></p>
-<p><em>e.g., ITI-TF-1: 7.1</em></p></td>
-<td>--</td>
-</tr>
-<tr class="even">
-<td>Actor B</td>
-<td>None</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr class="odd">
-<td><p>Actor C</p>
-<p><em>In this example, Actor C shall be grouped with all three actors listed in column 2</em></p></td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym/Actor</em></p></td>
-<td>--</td>
-<td>See Note 1</td>
-</tr>
-<tr class="even">
-<td></td>
-<td><em>external Domain Acronym or blank profile acronym/Actor</em></td>
-<td>--</td>
-<td>See Note 1</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym/Actor</em></p></td>
-<td>--</td>
-<td>See Note 1</td>
-</tr>
-<tr class="even">
-<td><p>Actor D <em>(See note 1)</em></p>
-<p><em>In this example, the note is used to indicate that the Actor D shall be grouped with one or more of the two actors of the two actors in column 2.</em></p></td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym/Actor</em></p></td>
-<td>--</td>
-<td>See Note 1</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym/Actor</em></p></td>
-<td>--</td>
-<td>See Note 1</td>
-</tr>
-<tr class="even">
-<td><p>Actor E</p>
-<p><em>In rare cases, the actor to be grouped with must implement an option. An example is in column 2.)</em></p></td>
-<td><p><em>external Domain Acronym or blank</em></p>
-<p><em>profile acronym Actor</em></p>
-<p><em>e.g., ITI RFD Form Filler with the Archive Form Option</em></p></td>
-<td><p><em>TF Reference to the Option definition; typically from Vol 1</em></p>
-<p><em>(e.g., ITI TF-1: 17.3.11)</em></p></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><em>e.g., Content Consumer (See Note 1)</em></td>
-<td><em>ITI XDS.b / Document Consumer</em></td>
-<td><em>ITI TF-1: 10.1</em></td>
-<td><em>PCC TF-2:4.1 (See Note 2)</em></td>
-</tr>
-<tr class="even">
-<td></td>
-<td><em>ITI XDR / Document Recipient</em></td>
-<td><em>ITI TF-1: 15.1</em></td>
-<td><em>PCC TF-2:4.1 (See Note 2)</em></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><em>ITI XDM / Portable Media Importer</em></td>
-<td><em>ITI TF-1: 16.1</em></td>
-<td><em>PCC TF-2:4.1 (See Note 2)</em></td>
-</tr>
-<tr class="even">
-<td><em>e.g., Content Consumer</em></td>
-<td><em>ITI CT / Time Client</em></td>
-<td><em>ITI TF-1: 7.1</em></td>
-<td>--</td>
-</tr>
-</tbody>
-</table>
-
-Note 1: *This is a short note. It may be used to describe situations
-where an actor from this profile may be grouped with one of several
-other profiles/actors.*
-
-Note 2: *A note could also be used to explain why the grouping is
-required, if that is still not clear from the text above.*
-
-alternative 2 Table XX.3-1: this Profile Acronym Profile
-
-* Required Actor Groupings
-
-All actors from this profile should be listed in Column 1. If no
-required grouping exists, "None" should be indicated in Column 3.
-
-Guidance on using the "Grouping Condition" column:
-
-* If an actor has no required grouping, Column 2 should contain "--".
-    See Actor A below.
-* If an actor has a required grouping that is not associated with a
-    profile option (i.e., it has no condition), column 2 should contain
-    "Required". See Actor B below.
-* Sometimes an option requires that an actor in this profile be
-    grouped with an actor in another profile. That condition is
-    specified in Column 2. See Actor C below.
-
-<p id ="tXX.3-1" class="tableTitle"><strong>Table XX.3-1: Actor Groupings</strong></p>
-
-<table border="1" borderspacing="0" style='border: 1px solid black; border-collapse: collapse'>
-<tbody>
-<tr class="odd">
-<td>this Profile Acronym Actor</td>
-<td>Grouping Condition</td>
-<td>Actor(s) to be grouped with</td>
-<td>Reference</td>
-</tr>
-<tr class="even">
-<td>Actor A</td>
-<td>--</td>
-<td>None</td>
-<td>--</td>
-</tr>
-<tr class="odd">
-<td>Actor B</td>
-<td>Required</td>
-<td><p><em>external Domain Acronym or blank profile acronym/Actor</em></p>
-<p><em>e.g., ITI CT / Time Client</em></p></td>
-<td><p><em>TF Reference; typically from Vol 1</em></p>
-<p><em>(e.g., ITI TF-1: 7.1)</em></p></td>
-</tr>
-<tr class="even">
-<td>Actor C</td>
-<td>With the <em>Option name in this profile</em> Option</td>
-<td><em>external Domain Acronym or blank profile acronym/Actor</em></td>
-<td><em>Where the Option is defined in this profile Section XX.3 z</em></td>
-</tr>
-<tr class="odd">
-<td><p>Actor D</p>
-<p><em>if an actor has both required and conditional groupings, list the Required grouping first</em></p></td>
-<td>Required</td>
-<td><em>external Domain Acronym or blank profile acronym/Actor</em></td>
-<td><em>TF Reference; typically from Vol 1</em></td>
-</tr>
-<tr class="even">
-<td></td>
-<td>If the <em>Option name in this profile</em> Option is supported.</td>
-<td><em>external Domain Acronym or blank profile acronym/Actor</em></td>
-<td><em>TF Reference; typically from Vol 1</em></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>If the <em>other Option name in this profile</em> Option is supported.</td>
-<td><em>external Domain Acronym or blank profile acronym/Actor</em></td>
-<td><em>TF Reference; typically from Vol 1</em></td>
-</tr>
-<tr class="even">
-<td><p>Actor E</p>
-<p><em>(In rare cases, the actor to be grouped with must implement an option, an example is in column 3)</em></p></td>
-<td>Required</td>
-<td><p><em>external Domain Acronym or blank profile acronym/Actor</em> with the <em>option name</em></p>
-<p><em>e.g. ITI RFD Form Filler with the Archive Form Option</em></p></td>
-<td><p><em>TF Reference to the Option definition; typically from Vol 1</em></p>
-<p><em>(eg ITI TF-1:17.3.11)</em></p></td>
-</tr>
-</tbody>
-</table>
+> **Editor's Note (provisional):** Required groupings are under review by the IHE-RO Technical Committee, including the precise PAM/scheduling groupings and the object store (OST) actor. See [Open Issues](issues.html).
 
 <a name="overview"> </a>
 
-## XX.4 ToDo Overview
+## X.4 SMRT Overview
 
-This section shows how the transactions/content modules of the profile
-are combined to address the use cases.
+This section shows how the transactions and content modules of the profile are combined to address the use cases. Use cases are informative, not normative, and "SHALL" language is not allowed in use cases.
 
-Use cases are informative, not normative, and "SHALL" language is
-not allowed in use cases.
+### X.4.1 Concepts
 
-<div>
-<img src="anImage.png" caption="Figure XX.4.1: Diagrammed in an image" width="70%" >
-</div>
+The SMRT Profile addresses the integration of "island" treatment devices — devices that are managed by a device-specific or embedded Treatment Management System (TMS) and that are not otherwise connected to the departmental Radiation Oncology Information System (ROIS). The profile defines the minimum exchanges needed for the ROIS to schedule, review, and track treatments performed on such devices as if they were part of the standard treatment device fleet.
 
-### XX.4.1 Concepts
+### X.4.2 Use Cases
 
-If needed, this section provides an overview of the concepts that
-provide necessary background for understanding the profile. If not
-needed, state "Not applicable." For an example of why/how this section
-may be needed, please see ITI Cross Enterprise Workflow (XDW).
+#### X.4.2.1 Use Case #1: Shared Management of Treatment
 
-It may be useful in this section but is not necessary, to provide a
-short list of the use cases described below and explain why they are
-different.
+This use case describes how clinical staff can use a single departmental Radiation Oncology Information System (ROIS) to schedule, review, and track the treatment progress of a therapy session conducted on a standalone treatment device.
 
-### XX.4.2 Use Cases
+##### X.4.2.1.1 Shared Management of Treatment Use Case Description
 
-#### XX.4.2.1 Use Case \#1: Regular Treatment
+This use case defines the minimum set of transactions required to establish a clinically acceptable integration workflow between a standalone treatment device and a departmental ROIS. This baseline workflow focuses on the exchange of patient demographics, scheduling, and treatment-related artifacts. More advanced interactions, such as the direct exchange of prescription information, are considered optional extensions (the Support Prescription Option).
 
-One or two sentence simple description of this particular use
-case.
+The departmental ROIS is responsible for managing the patient's clinical journey and maintaining the authoritative record of the patient's treatment course. Its core responsibilities, as defined by this profile, are:
 
-Note that Section XX.4.2.1 repeats in its entirety for additional use
-cases (replicate as Section XX.4.2.2, XX.4.2.3, etc.).
+- **Patient and Schedule Management:** It synchronizes patient demographics, encounters, the patient photo, and appointment information with the TMS to prepare it for the treatment workflow.
+- **Treatment Approval:** It is the system where clinical approval for treatment is given. It communicates this authorization to the TMS, serving as the gatekeeper for proceeding with treatment delivery.
+- **Artifact Consolidation and Oversight:** It provides a centralized point of access to all treatment-related artifacts. It receives notifications from the TMS when planning and treatment delivery artifacts are available, and it may selectively retrieve them as needed to provide a holistic view for clinical review and progress tracking and, optionally, serve as the long-term archive for all retrieved data.
 
-##### XX.4.2.1.1 simple name Use Case Description
+Each device-specific TMS functions as a specialized subsystem for treatment execution. It is responsible for coordinating the treatment planning activities and for detailed management of the delivery of the treatment sessions on its associated device(s). It reports the status and results of these activities back to the ROIS, thereby contributing to the patient's authoritative treatment course record.
 
-Describe the key use cases addressed by the profile. Limit to a
-maximum of one page of text or consider an appendix.
+##### X.4.2.1.2 Shared Management of Treatment Process Flow
 
-##### XX.4.2.1.2 simple name Process Flow
-
-Diagram and describe the process flow(s) covered by this profile in
-order to satisfy the use cases. Demonstrate how the profile transactions
-are combined/sequenced. To provide context and demonstrate how the
-profile interacts with other profiles, feel free to include transactions
-and events that are "external" to this profile (using appropriate
-notation.)
-
-The set of process flows will typically be exemplary, not exhaustive
-(i.e., it will address all the use cases, but will not show all possible
-combinations of actors, or all possible sequencing of transactions).
-
-If there are detailed behavioral rules that apply to a specific process
-flow or multiple process flows, an appendix may be added as needed.
-
-The roles at the top of the swimlane diagram should correspond to
-actor names, include the profile acronym:actor name if referencing an
-actor from a different profile.
-
-Modify the following "Swimlane Diagram". You can use plantuml or mermaid. see details on [using mermaid in the IG publisher](https://build.fhir.org/ig/FHIR/ig-guidance/diagrams-mermaid.html). Mermaid [user guide online](https://mermaid.js.org/intro/getting-started.html).  Plantuml seems more stable, and does support clickable links on artifacts. Goto [plantuml.com](http://plantuml.com) for an online tool to draft plantuml files.
+The process flow for this use case is initiated by the departmental ROIS, which is the central point of management for the patient's entire treatment journey. Transactions shown in *italics* are reused from other profiles/standards (see Table X.1-2) or are external to this profile.
 
 <figure>
 {% include usecase1-processflow.svg %}
-<figcaption><strong>XX.4.2.2-1: Basic Process Flow in SMRT Profile</strong></figcaption>
+<figcaption><strong>Figure X.4.2.1.2-1: Basic Process Flow in SMRT Profile</strong></figcaption>
 </figure>
 <br clear="all"/>
 
-If process flow "swimlane" diagrams require additional explanation
-to clarify conditional flows, or flow variations need to be described
-where alternate systems may be playing different actor roles, document
-those conditional flows here.
+**Pre-conditions:** A patient has been registered in the Hospital Information System (HIS) and the departmental ROIS, and a standalone treatment device managed by a TMS is available for the patient's treatment.
 
-Delete the material below if this is a workflow or transport
-profile. Delete the material above if this profile is a content module
-only profile.
+**Main Flow:**
 
-**Pre-conditions**:
+*Patient Registration:*
 
-Very briefly (typically one sentence) describe the conditions or
-timing when this content module would be used.
+- The patient is registered in the HIS and the demographics are synchronized to the ROIS (external; HL7 V2 ADT).
+- The ROIS assigns the patient to the TMS and synchronizes the patient demographics to the TMS using *Patient Identity Management [ITI-30]* (HL7 V2 ADT), and optionally the patient encounter using *Patient Encounter Management [ITI-31]*.
+- The ROIS sends the patient photo to the TMS using Sync Patient Photo [RO-SMRT-01] — either by value (Base64) or by reference to a DICOM SC image which the TMS retrieves.
 
-**Main Flow**:
+*Appointment Scheduling:*
 
-Typically in an enumerated list, describe the clinical workflow
-when, where, and how this content module would be used.
+- The ROIS optionally creates the treatment intent (treatment site, modality/technique, prescribed dose, number of fractions).
+- The ROIS schedules the treatment appointments and synchronizes them to the TMS (*HL7 V2 SIU*).
 
-**Post-conditions:**
+*Treatment Planning:*
 
-Very briefly (typically one sentence) describe the state of the
-clinical scenario after this content module has been created including
-examples of potential next steps.
+- *(Support Prescription Option, beyond MVP)* the ROIS creates the prescription and the TMS retrieves the prescription summary using *Retrieve Prescription Summary [XRTS-08]*.
+- The TMS imports an approved plan, or imports and approves a plan, and enriches it.
+- The TMS reports that the planning artifacts are ready using Report Planning Artifacts [RO-SMRT-02] (FHIR message referencing DICOM); the ROIS retrieves the required artifacts (RT Plan, optionally CT, RT Structure Set, RT Dose) from the object store (*DICOM*).
+
+*Treatment Approval:*
+
+- When the plan is approved for delivery in the ROIS, the ROIS sends the approval to the TMS using Report Treatment Approval [RO-SMRT-03].
+- The TMS adds the approval to the plan and reports that the final delivery plan is ready using Report Planning Artifacts [RO-SMRT-02]; the ROIS retrieves the RT Plan (*DICOM*).
+
+*Treatment Delivery:*
+
+- The patient is checked-in for a scheduled appointment at the ROIS or the TMS, and the other actor is notified (*Report Patient Check-in, HL7 V2 SIU*).
+- The TMS delivers the treatment session.
+
+*Report Treatment Artifacts:*
+
+- When the session is complete, the TMS reports that the treatment artifacts are ready using Report Treatment Artifacts [RO-SMRT-04] (FHIR message referencing DICOM: RT Record, RT Structure Set, CT, RT Dose); the ROIS retrieves the required artifacts from the object store (*DICOM*) and tracks treatment progress.
+
+*Post-Treatment Activities:*
+
+- Image review is performed at the TMS — which reports the results using Report Image Review Results [RO-SMRT-05] — or at the ROIS.
+- The ROIS shares the treatment summary with the HIS and submits billing (external; *HL7 V2 ORU / XRTS* and *HL7 V2 DFT*).
+
+**Post-conditions:** The ROIS holds (or can retrieve) the planning and treatment-delivery artifacts for the session, enabling unified scheduling, review, and progress tracking of the standalone device alongside the rest of the treatment device fleet.
 
 <a name="security-considerations"> </a>
 
-## XX.5 ToDo Security Considerations
+## X.5 SMRT Security Considerations
 
-See ITI TF-2x: [Appendix Z.8 "Mobile Security Considerations"](https://profiles.ihe.net/ITI/TF/Volume2/ch-Z.html#z.8-mobile-security-considerations)
+The SMRT Profile exchanges protected health information (patient demographics, photos, schedules, prescriptions, planning and treatment-delivery artifacts) between the ROIS and the TMS. A formal risk assessment will be performed by the IHE-RO Technical Committee; the considerations below summarize the expected baseline.
 
-The following is instructions to the editor and this text is not to be included in a publication.
-The material initially from [RFC 3552 "Security Considerations Guidelines" July 2003](https://tools.ietf.org/html/rfc3552).
+- **Confidentiality and integrity in transit:** transactions should be carried over secure, mutually authenticated channels. Actors are expected to be grouped with ATNA Secure Node or Secure Application (see [Required Groupings](#required-groupings)).
+- **Consistent time:** actors are expected to be grouped with a Consistent Time (CT) Client so that audit records and treatment timelines are correlated across systems.
+- **Audit logging:** security-relevant events (artifact reporting, retrieval, approval, demographic updates) should be recorded as audit events; profiling of audit messages leverages the Basic Audit Log Patterns (BALP) content this IG depends on.
+- **Authorization:** Responders may restrict results based on the authorization of the Initiator.
 
-This section should address downstream design considerations, specifically for: Privacy, Security, and Safety. These might need to be individual header sections if they are significant or need to be referenced.
-
-The editor needs to understand Security and Privacy fundamentals.
-General [Security and Privacy guidance]({{site.data.fhir.path}}secpriv-module.html) is provided in the FHIR Specification. 
-The FHIR core specification should be leveraged where possible to inform the reader of your specification.
-
-IHE FHIR based profiles should reference the [ITI Appendix Z](https://profiles.ihe.net/ITI/TF/Volume2/ch-Z.html) section 8 Mobile Security and Privacy Considerations base when appropriate.
-
-IHE Document Content profiles can reference the security and privacy provided by the Document Sharing infrastructure as directly grouped or possibly to be grouped.
-
-   While it is not a requirement that any given specification or system be
-   immune to all forms of attack, it is still necessary for authors of specifications to
-   consider as many forms as possible.  Part of the purpose of the
-   Security and Privacy Considerations section is to explain what attacks have been
-   considered and what countermeasures can be applied to defend against them.
-
-   There should be a clear description of the kinds of threats on the
-   described specification.  This should be approached as an
-   effort to perform "due diligence" in describing all known or
-   foreseeable risks and threats to potential implementers and users.
-
-Authors MUST describe:
-
-* which attacks have been considered and addressed in the specification
-* which attacks have been considered but not addressed in the specification
-* what could be done in system design, system deployment, or user training
-
-   At least the following forms of attack MUST be considered:
-   eavesdropping, replay, message insertion, deletion, modification, and
-   man-in-the-middle.  Potential denial of service attacks MUST be
-   identified as well.  If the specification incorporates cryptographic
-   protection mechanisms, it should be clearly indicated which portions
-   of the data are protected and what the protections are (i.e.,
-   integrity only, confidentiality, and/or endpoint authentication,
-   etc.).  Some indication should also be given to what sorts of attacks
-   the cryptographic protection is susceptible.  Data which should be
-   held secret (keying material, random seeds, etc.) should be clearly
-   labeled.
-
-   If the specification involves authentication, particularly user-host
-   authentication, the security of the authentication method MUST be
-   clearly specified.  That is, authors MUST document the assumptions
-   that the security of this authentication method is predicated upon.
-
-   The threat environment addressed by the Security and Privacy Considerations
-   section MUST at a minimum include deployment across the global
-   Internet across multiple administrative boundaries without assuming
-   that firewalls are in place, even if only to provide justification
-   for why such consideration is out of scope for the protocol.  It is
-   not acceptable to only discuss threats applicable to LANs and ignore
-   the broader threat environment.  In
-   some cases, there might be an Applicability Statement discouraging
-   use of a technology or protocol in a particular environment.
-   Nonetheless, the security issues of broader deployment should be
-   discussed in the document.
-
-   There should be a clear description of the residual risk to the user
-   or operator of that specification after threat mitigation has been
-   deployed.  Such risks might arise from compromise in a related
-   specification (e.g., IPsec is useless if key management has been
-   compromised), from incorrect implementation, compromise of the
-   security technology used for risk reduction (e.g., a cipher with a
-   40-bit key), or there might be risks that are not addressed by the
-   specification (e.g., denial of service attacks on an
-   underlying link protocol).  Particular care should be taken in
-   situations where the compromise of a single system would compromise
-   an entire protocol.  For instance, in general specification designers
-   assume that end-systems are inviolate and don't worry about physical
-   attack.  However, in cases (such as a certificate authority) where
-   compromise of a single system could lead to widespread compromises,
-   it is appropriate to consider systems and physical security as well.
-
-   There should also be some discussion of potential security risks
-   arising from potential misapplications of the specification or technology
-   described in the specification.  
-  
-This section also include specific considerations regarding Digital Signatures, Provenance, Audit Logging, and De-Identification.
-
-Where audit logging is specified, a StructureDefinition profile(s) should be included, and Examples of those logs might be included.
+This section will be expanded with the threat model, mitigations, and residual risks. See [Open Issues](issues.html).
 
 <a name="other-grouping"> </a>
 
-## XX.6 ToDo Cross-Profile Considerations
+## X.6 SMRT Cross-Profile Considerations
 
-This section is informative, not normative. It is intended to put
-this profile in context with other profiles. Any required groupings
-should have already been described above. Brief descriptions can go
-directly into this section; lengthy descriptions should go into an
-appendix. Examples of this material include ITI Cross Community Access
-(XCA) Grouping Rules (Section 18.2.3), the Radiology associated profiles
-listed at wiki.ihe.net, or ITI Volume 1 Appendix E "Cross Profile
-Considerations", and the "See Also" sections Radiology Profile
-descriptions on the wiki such as
-<http://wiki.ihe.net/index.php/Scheduled_Workflow#See_Also>. If this
-section is left blank, add "Not applicable."
+This section is informative.
 
-Consider using a format such as the following:
+**IHE-ITI PAM (Patient Administration Management)** — SMRT reuses Patient Identity Management [ITI-30] and Patient Encounter Management [ITI-31] to synchronize patient demographics and encounters between the ROIS and the TMS.
 
-other profile acronym - other profile name
+**IHE-RO XRTS** — With the Support Prescription Option, the TMS retrieves the prescription summary from the ROIS using Retrieve Prescription Summary [XRTS-08]. The treatment summary shared with the HIS also relates to XRTS content.
 
-A other profile actor name in other profile name might
-be grouped with a this profile actor name to describe
-benefit/what is accomplished by grouping.
+**IHE-RO TDW-II (Treatment Delivery Workflow II)** — A TMS integrated with the ROIS via TDW-II is managed through that profile. SMRT addresses the complementary case of standalone, device-specific or embedded TMSs.
+
+**DICOM / RT objects** — The planning and treatment artifacts referenced by SMRT FHIR messages (RT Plan, RT Record, RT Structure Set, RT Dose, images, spatial registration objects) are DICOM RT objects retrieved from an object store using established DICOM transactions.

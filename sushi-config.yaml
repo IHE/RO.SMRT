@@ -4,10 +4,10 @@
 # e.g. ihe.iti.mhds, or ihe.iti.basicaudit
 id: ihe.ro.smrt
 canonical: https://profiles.ihe.net/RO/SMRT
-version: 0.0.1-current
+version: 0.0.2-current
 name: IHE_RO_SMRT
-title: "Shared Managament of Radiation Treatments"
-description: Defines the workflow and content necessary to connect any machine-integrated Treatment Management Systems (TMS) with a departmental Radiation Oncology Information System (ROIS) and Hospital-wide Information system (HIS)
+title: "Shared Management of Radiation Treatments"
+description: Defines the workflow and content necessary to connect any device-specific Treatment Management System (TMS) with a single departmental Radiation Oncology Information System (ROIS), enabling a holistic view of all ongoing treatments.
 releaseLabel: ci-build
 #releaseLabel: ballot
 #releaseLabel: trial-use
@@ -64,16 +64,28 @@ parameters:  # see https://confluence.hl7.org/display/FHIR/Implementation+Guide+
 pages:
 # itemize here each narrative page. Include assigned section numbers when appropriate. The order they appear here is the order they will appear in the TOC and on the next/prev navigation.
   index.md:
-    title: 1:XX Shared Management of Radiation Therapy (SMRT) Home
+    title: 1:X Shared Management of Radiation Therapy (SMRT) Home
     generation: markdown
   volume-1.md:
-    title: 1:XX Shared Management of Radiation Therapy (SMRT) Volume 1
+    title: 1:X Shared Management of Radiation Therapy (SMRT) Volume 1
     generation: markdown
   RO-SMRT-01.md:
-    title: 2:3.YY Query Treatment Strategy [RO-SMRT-01]
+    title: 2:3.Y1 Sync Patient Photo [RO-SMRT-01]
+    generation: markdown
+  RO-SMRT-02.md:
+    title: 2:3.Y2 Report Planning Artifacts [RO-SMRT-02]
+    generation: markdown
+  RO-SMRT-03.md:
+    title: 2:3.Y3 Report Treatment Approval [RO-SMRT-03]
+    generation: markdown
+  RO-SMRT-04.md:
+    title: 2:3.Y4 Report Treatment Artifacts [RO-SMRT-04]
+    generation: markdown
+  RO-SMRT-05.md:
+    title: 2:3.Y5 Report Image Review Results [RO-SMRT-05]
     generation: markdown
   domain-ZZ.md:
-    title: 3:?.ZZ Content one [Domain-ZZ]
+    title: 3:Z.ZZ SMRT Content Modules
     generation: markdown
   testplan.md:
     title: "Test Plan"
@@ -99,9 +111,13 @@ menu:
     Security Considerations: volume-1.html#security-considerations
     Cross-Profile Considerations: volume-1.html#other-grouping
   Volume 2:
-    "Query Treatment Strategy [RO-SMRT-01]": RO-SMRT-01.html
+    "Sync Patient Photo [RO-SMRT-01]": RO-SMRT-01.html
+    "Report Planning Artifacts [RO-SMRT-02]": RO-SMRT-02.html
+    "Report Treatment Approval [RO-SMRT-03]": RO-SMRT-03.html
+    "Report Treatment Artifacts [RO-SMRT-04]": RO-SMRT-04.html
+    "Report Image Review Results [RO-SMRT-05]": RO-SMRT-05.html
   Volume 3:
-    "Content one [Domain-ZZ]": domain-ZZ.html
+    "SMRT Content Modules": domain-ZZ.html
   Artifacts: artifacts.html
   Other:
     Changes to Other IHE Specifications: other.html

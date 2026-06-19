@@ -1,0 +1,34 @@
+@startuml
+skinparam svgDimensionStyle true
+hide footbox
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
+
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
+
+participant "Treatment\nManagement System\n(TMS)" as TMS
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+
+TMS -[#1A5276]-> ROIS : **1.** Report Image Review Results [RO-SMRT-05]\n<i>(FHIR message)</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+
+note over TMS, ROIS
+  Sent when image review (e.g., CBCT evaluation)
+  is completed at the TMS following treatment delivery.
+end note
+@enduml

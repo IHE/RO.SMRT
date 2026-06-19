@@ -1,0 +1,42 @@
+@startuml
+skinparam svgDimensionStyle true
+hide footbox
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
+
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+  GroupBackgroundColor #F0F7FF
+  GroupBorderColor #5D8AA8
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
+
+participant "Treatment\nManagement System\n(TMS)" as TMS
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+participant "Object Store\n(OST)" as OST #F4F6F6
+
+TMS -[#1A5276]-> ROIS : **1.** Report Planning Artifacts [RO-SMRT-02]\n<i>(FHIR message — refs DICOM RT Plan, [CT, RT Structure Set, RT Dose])</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+
+opt Artifact Retrieval
+  ROIS -[#CA6F1E]-> OST : **2.** Retrieve Planning Artifacts\n<i>(DICOM C-MOVE / C-GET / WADO-RS)</i>
+  OST --[#CA6F1E]--> ROIS : <i>RT Plan, [CT, RT Structure Set, RT Dose]</i>
+end
+
+note over TMS, OST
+  Sent when planning artifacts are ready (after plan enrichment),
+  and again after treatment approval (final delivery plan).
+end note
+@enduml

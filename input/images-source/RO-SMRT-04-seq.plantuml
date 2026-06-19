@@ -1,0 +1,44 @@
+@startuml
+skinparam svgDimensionStyle true
+hide footbox
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderThickness 2
+
+skinparam participant {
+  BackgroundColor #D6EAF8
+  BorderColor #1A5276
+  FontStyle bold
+}
+skinparam sequence {
+  LifeLineBorderColor #1A5276
+  LifeLineBackgroundColor #EBF5FB
+  GroupBackgroundColor #F0F7FF
+  GroupBorderColor #5D8AA8
+}
+skinparam note {
+  BackgroundColor #FDFEFE
+  BorderColor #BFC9CA
+  FontSize 10
+}
+
+participant "Treatment\nManagement System\n(TMS)" as TMS
+participant "Radiation Oncology\nInformation System\n(ROIS)" as ROIS
+participant "Object Store\n(OST)" as OST #F4F6F6
+
+TMS -[#1A5276]-> ROIS : **1.** Report Treatment Artifacts [RO-SMRT-04]\n<i>(FHIR message — refs DICOM: RT Record, RT Structure Set, CT, RT Dose)</i>
+ROIS --[#1A5276]--> TMS : Acknowledgement
+
+opt Artifact Retrieval
+  ROIS -[#CA6F1E]-> OST : **2.** Retrieve Treatment Artifacts\n<i>(DICOM C-MOVE / C-GET / WADO-RS)</i>
+  OST --[#CA6F1E]--> ROIS : <i>RT Record, [RT Structure Set, CT, RT Dose]</i>
+end
+
+ROIS -> ROIS : **3.** Track Treatment Progress
+
+note over TMS, OST
+  Sent by the TMS when a treatment session is complete.
+  The ROIS selectively retrieves artifacts needed for progress tracking.
+end note
+@enduml
