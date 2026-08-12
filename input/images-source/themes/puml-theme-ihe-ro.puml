@@ -1,0 +1,119 @@
+---
+name: ihe-ro
+display_name: IHE International - Sequence Diagrams
+description: CSS-based theme for sequence diagrams using IHE International branding colors
+author: David Wikler
+release: 
+license: 
+version: 
+source: https://www.ihe.net/
+inspiration: IHE International corporate branding
+---
+
+!$THEME = "ihe-ro"
+
+'' IHE International Color Palette
+'' Purple (Official IHE Brand Colors)
+!$IHE_PURPLE_80 = '#330066'
+!$IHE_PURPLE_70 = '#4d2980'
+!$IHE_PURPLE_60 = '#664d99'
+!$IHE_PURPLE_50 = '#8066b3'
+!$IHE_PURPLE_40 = '#9980cc'
+!$IHE_PURPLE_30 = '#9c7dbe'
+!$IHE_PURPLE_20 = '#c9c5dd'
+!$IHE_PURPLE_10 = '#e8e6f4'
+
+'' Neutral Grays
+!$GRAY_10 = '#f9f9f9'
+!$GRAY_20 = '#f0f0f0'
+!$GRAY_30 = '#e5e5e5'
+!$GRAY_40 = '#c9c9c9'
+!$GRAY_50 = '#a8a8a8'
+!$GRAY_60 = '#7a7a7a'
+!$GRAY_70 = '#525252'
+!$GRAY_80 = '#3a3a3a'
+!$GRAY_100 = '#161616'
+!$WHITE = '#ffffff'
+
+''
+'' CSS-Based Sequence Diagram Theme
+'' Pure CSS styling - no skinparam
+''
+
+<style>
+
+root {
+  FontName Liberation Mono
+  FontSize 12
+  FontColor $GRAY_80
+  BackgroundColor $WHITE
+}
+
+sequenceDiagram {
+
+  participant {
+    BackgroundColor $IHE_PURPLE_10
+    LineColor $IHE_PURPLE_80
+    LineThickness 1
+    FontName Liberation Sans
+    FontColor $IHE_PURPLE_80
+    FontStyle normal
+    FontSize 12
+    RoundCorner 2
+    Padding 10 15
+    Margin 5 30
+  }
+  
+  actor {
+    BackgroundColor $IHE_PURPLE_10
+    LineColor $IHE_PURPLE_80
+    LineThickness 1
+    FontColor $GRAY_80
+    FontStyle normal
+    FontSize 12
+    RoundCorner 2
+  }
+  
+  lifeLine {
+    LineColor $GRAY_50
+    LineThickness 1
+  }
+
+  arrow {
+    Color $IHE_PURPLE_80
+    LineColor $IHE_PURPLE_80
+    FontColor $GRAY_80
+    Thickness 2
+  }
+
+  group {
+    BackgroundColor $WHITE
+    LineColor $IHE_PURPLE_80
+    LineThickness 0.5
+    FontColor $IHE_PURPLE_80
+    FontStyle normal
+  }
+
+  groupHeader {
+    BackgroundColor $IHE_PURPLE_10
+    LineThickness 0.5
+    FontColor $IHE_PURPLE_80
+    FontStyle normal
+  }
+
+  separator {
+    BackgroundColor $IHE_PURPLE_10
+    LineColor $IHE_PURPLE_10
+    FontColor $IHE_PURPLE_30
+  }
+
+  note {
+    BackgroundColor $IHE_PURPLE_10
+    LineColor $IHE_PURPLE_40
+    LineThickness 1
+    FontColor $IHE_PURPLE_60
+  }
+
+}
+
+</style>

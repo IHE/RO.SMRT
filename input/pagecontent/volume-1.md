@@ -1,11 +1,31 @@
 
-The Shared Managament of Radiation Therapy (SMRT) Profile defines the workflow and content necessary to connect any machine-integrated Treatment Planning and Management System (TPMS) with a departmental Radiation Oncology Information System (ROIS).
+In contemporary radiation oncology clinics, a single Radiation Oncology Information System (ROIS)
+is deployed to manage the electronic medical records (EMR) for all patients. This centralized
+system is used by radiation oncologists and departmental staff to prescribe, schedule, and track
+the complete course of treatment for each patient.
 
-There is a need to be able to incorporate “island” treatment devices into a larger, departmental Radiation Oncology Information System (ROIS). Such "island" treatment devices often come with their local TPMS fully tailored to the capabilities of that treatment device. The Oncology department needs to be able to schedule, review and track treatment progress for these devices as they do for the other standard treatment devices of their treatment device fleet.
+For an optimal workflow, all treatment devices should be interfaced with the ROIS to enable
+scheduling, prescription management, and treatment progress monitoring to be performed directly
+within that single, centralized system.
 
-This profile provides the mechanisms to exchange the required treatment planning and treatment delivery artefcats to support beforementioned scenarios and to allow a holistioc view of the on-going treatments in the ROIS.
+While some treatment devices can be managed by a Treatment Management System (TMS) integrated with
+the ROIS via the IHE-RO TDW-II profile, many others interface exclusively with a device-specific
+TMS or contain an integrated TMS. This is increasingly common with the emergence of treatment
+devices for novel techniques like Online Adaptive Radiation Therapy (OART), which utilizes imaging
+such as CBCT, CT, or MRI, and PET-based Dose-Guided Radiation Therapy (DGRT), which often bundle
+the TMS, Treatment Planning System (TPS), and TDD actors.
 
-**TODO: Explicitly state whether this is a Workflow, Transport, or Content Module (or combination) profile. See the IHE Technical Frameworks General Introduction for definitions of these profile types. The IHE Technical Frameworks [General Introduction](https://profiles.ihe.net/GeneralIntro/). **
+These standalone TDDs are frequently disconnected from the departmental ROIS, creating isolated
+"islands" where treatments must be scheduled and tracked separately. This forces staff to rely on
+inefficient and error-prone workarounds, such as manual data entry or ad-hoc software bridges.
+Integrating these devices into the main ROIS is therefore essential to provide the same unified
+scheduling, review, and tracking capabilities available for the standard treatment device fleet.
+
+The SMRT profile provides the necessary mechanisms for exchanging scheduling, planning, and
+treatment delivery artifacts to support these scenarios, thereby enabling a holistic and unified
+view of all ongoing treatments within the ROIS.
+
+This profile is a Workflow and Content Profile.
 
 <a name="actors-and-transactions"> </a>
 
@@ -383,7 +403,90 @@ different.
 
 ### XX.4.2 Use Cases
 
-#### XX.4.2.1 Use Case \#1: Regular Treatment
+#### XX.4.2.1 Use Case \#1: Shared Management of Treatment
+
+This use case describes how clinical staff can use a single departmental Radiation Oncology
+Information System (ROIS) to schedule, review, and track the treatment progress of a therapy
+session conducted on a standalone treatment device.
+
+##### XX.4.2.1.1 Shared Management of Treatment Use Case Description
+
+to establish a clinically acceptable integration workflow between a standalone treatment device
+and a departmental ROIS. This baseline workflow focuses on the exchange of patient demographics,
+scheduling, and treatment-related artifacts. More advanced interactions, such as the direct
+exchange of prescription information, are considered optional extensions.
+
+The departmental ROIS is responsible for managing the patient's clinical journey and maintaining
+the authoritative record of the patient's treatment course. Its core responsibilities, as defined
+by this profile, are:
+
+- Patient and Schedule Management: It is responsible for synchronizing patient demographics and
+appointment information with the TMS to prepare it for the treatment workflow.
+- Treatment Approval: It is the system where clinical approval for treatment is given.
+It communicates this authorization to the TMS, serving as the gatekeeper for proceeding with
+treatment delivery.
+- Artifact Consolidation and Oversight: It provides a centralized point of access to all
+treatment-related artifacts. It receives notifications from the TMS when planning and treatment
+delivery artifacts are available, and it may selectively retrieve them as needed to provide
+a holistic view for clinical review and progress tracking and, optionally serve as the long-term
+archive for all retrieved data.
+Each device-specific TMS functions as a specialized subsystem for treatment execution.
+It is responsible for coordinating the treatment planning activities and for detailed management
+of the delivery of the treatment sessions on its associated device(s). It reports the status and
+results of these activities back to the ROIS, thereby contributing to the patient's authoritative
+treatment course record.
+
+##### XX.4.2.1.2 Shared Management of Treatment Process Flow
+
+<figure>
+{% include usecase1-processflow.svg %}
+<figcaption><strong>XX.4.2.2-1: Basic Process Flow in SMRT Profile</strong></figcaption>
+</figure>
+<br clear="all"/>
+
+If process flow "swimlane" diagrams require additional explanation
+The process flow for this use case is initiated by the departmental ROIS, which is the central
+point of management for the patient's entire treatment journey.
+Patient Registration:
+- When a patient is registered in the ROIS, the ROIS sends the patient demographics to the TMS.
+- The ROIS sends the patient encounter information to the TMS.
+- The ROIS sends the patient photo to the TMS either by value in a FHIR message, or by reference
+in a FHIR message for subsequent retrieval from the ROIS.
+- When a series of apppointments are scheduled for the treatment fractions in the ROIS, the ROIS
+sends all scheduled appointments to the TMS.
+- At any point during the workflow,
+    - if the patient demographics or appointments are modified, the ROIS updates the demographics
+    or appointments in the TMS.
+    - if the patient identitifier is changed, the ROIS notifies the TMS of the change. 
+    
+Treatment Planning:
+- When a plan is imported and approved in the TMS, the plan is enriched in the TMS.
+- The TMS sends, to the ROIS, information about all treatment planning artifacts which are ready
+for retrieval. 
+- The ROIS retrieves, from the OST, the artifacts (e.g., RT Plan) which are required for treatment
+progress tracking.
+
+Treatment Approval:
+- When the plan is approved for delivery in the ROIS, the ROIS sends the approval to the TMS.
+- The TMS adds the approval to the plan.
+- The TMS then sends, to the ROIS, information about all treatment delivery artifacts which are
+ready for retrieval.
+- The ROIS retrieves, from the OST, the artifacts (e.g., RT Plan) which are required for treatment
+progress tracking.
+
+Treatment Delivery:
+- When a patient is checked-in for a scheduled appointment, either at the ROIS or at the TMS,
+the ROIS or the TMS notifies the TMS or the ROIS that treatment session delivery is ready to be
+managed by the TMS.
+- When the treatment session is complete or canceled, the TMS sends, to the ROIS, information
+about all treatment artifacts which are ready for retrieval. 
+- The ROIS retrieves, from the OST, the artifacts (e.g., RT Record) which are required for
+treatment progress tracking.
+
+
+<a name="security-considerations"> </a>
+
+#### XX.4.2.2 Use Case \#2: Regular Treatment
 
 One or two sentence simple description of this particular use
 case.
@@ -391,12 +494,12 @@ case.
 Note that Section XX.4.2.1 repeats in its entirety for additional use
 cases (replicate as Section XX.4.2.2, XX.4.2.3, etc.).
 
-##### XX.4.2.1.1 simple name Use Case Description
+##### XX.4.2.2.1 simple name Use Case Description
 
 Describe the key use cases addressed by the profile. Limit to a
 maximum of one page of text or consider an appendix.
 
-##### XX.4.2.1.2 simple name Process Flow
+##### XX.4.2.2.2 simple name Process Flow
 
 Diagram and describe the process flow(s) covered by this profile in
 order to satisfy the use cases. Demonstrate how the profile transactions
@@ -449,7 +552,6 @@ Very briefly (typically one sentence) describe the state of the
 clinical scenario after this content module has been created including
 examples of potential next steps.
 
-<a name="security-considerations"> </a>
 
 ## XX.5 ToDo Security Considerations
 

@@ -1,5 +1,5 @@
 
-The Shared Managament of Radiation Therapy (SMRT) Profile defines the workflow and content necessary to connect any machine-integrated Treatment Planning and Management System (TPMS) with a departmental Radiation Oncology Information System (ROIS).
+The Shared Managament of Radiation Treatments (SMRT) Profile defines the workflow and content necessary to connect any machine-integrated Treatment Planning and Management System (TPMS) with a departmental Radiation Oncology Information System (ROIS).
 
 <div markdown="1" class="stu-note">
 
