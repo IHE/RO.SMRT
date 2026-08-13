@@ -47,21 +47,29 @@ in other related profiles are shown in dotted lines.
 
 <p id ="tXX.1-1" class="tableTitle"><strong>Table XX.1-1: SMRT Profile - Actors and Transactions</strong></p>
 
-| Actors  | Transactions                         | Initiator or Responder | Optionality     | Reference                                  |
-|---------|--------------------------------------|------------------------|-----------------|--------------------------------------------|
-| ROIS    | RO-SMRT-01 Query Treatment Strategy  | Responder              | R (Note 1)      | [Domain Acronym TF-2: 3.Y1](./domain-Y1.html) |
-|         | RO-SMRT-02 Query Diagnosis           | Responder              | R               | [Domain Acronym TF-2: 3.Y2](./domain-Y2.html) |
-| TMS     | RO-SMRT-01 Query Treatment Strategy  | Initiator              | R               | [Domain Acronym TF-2: 3.Y1](./domain-Y1.html) |
-|         | RO-SMRT-02 Query Diagnosis           | Initiator              | R               | [Domain Acronym TF-2: 3.Y2](./domain-Y2.html) |
+| Actors  | Transactions                                 | Initiator or Responder | Optionality | Reference                                                             |
+|---------|----------------------------------------------|------------------------|-------------|-----------------------------------------------------------------------|
+| ROIS    | Patient Identity Management [ITI-30]         | Initiator              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
+|         | Patient Encounter Management [ITI-31]        | Initiator              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
+|         | Send Patient Photo [RO-SMRT-01]              | Initiator              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
+|         | Appointment Notification [RAD-48]            | Initiator              | R           | RAD TF-2: 4.48                                                        |
+|         | Report Planning Artifacts Ready [RO-SMRT-02] | Responder              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
+|         | Retrieve Planning Artifacts [RO-SMRT-03]     | Initiator              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
+|         | Report Delivery Artifacts Ready [RO-SMRT-04] | Responder              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
+|         | Retrieve Delivery Artifacts [RO-SMRT-05]     | Initiator              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
+|         | Report Session Artifacts Ready [RO-SMRT-06]  | Responder              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
+|         | Retrieve Session Artifacts [RO-SMRT-07]      | Initiator              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
+| TMS     | Patient Identity Management [ITI-30]         | Responder              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
+|         | Patient Encounter Management [ITI-31]        | Responder              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
+|         | Send Patient Photo [RO-SMRT-01]              | Responder              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
+|         | Appointment Notification [RAD-48]            | Responder              | R           | RAD TF-2: 4.48                                                        |
+|         | Report Planning Artifacts Ready [RO-SMRT-02] | Initiator              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
+|         | Report Delivery Artifacts Ready [RO-SMRT-04] | Initiator              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
+|         | Report Session Artifacts Ready [RO-SMRT-06]  | Initiator              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
+| OST     | Retrieve Planning Artifacts [RO-SMRT-03]     | Responder              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
+|         | Retrieve Delivery Artifacts [RO-SMRT-05]     | Responder              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
+|         | Retrieve Session Artifacts [RO-SMRT-07]      | Responder              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
 {: .grid}
-
-Note 1: *For example, a note could specify that at least one of the
-transactions shall be supported by an actor or other variations. For
-example: Note: Either Transaction Y3 or Transaction Y4 shall be
-implemented for Actor E.*
-
-Note 2: *For example, could specify that Transaction Y4 is required
-if Actor B supports XYZ Option, see Section XX.3.X.*
 
 ### XX.1.1 Actors
 The actors in this profile are described in more detail in the sections below.
@@ -70,7 +78,36 @@ The actors in this profile are described in more detail in the sections below.
 
 #### XX.1.1.1 Radiation Oncology Information System (ROIS)
 
-The Client queries for blah meeting certain criteria and may retrieve selected blah.
+Within the context of the SMRT profile, the ROIS serves as the system of record for the radiation
+therapy treatment workflow. It provides the clinical, scheduling, and administrative information
+required to coordinate planning and treatment delivery activities, regardless of whether portions
+of that information originate within the ROIS itself or are received from external systems.
+Its core responsibilities in this profile include:
+
+* **Patient Registration Management**: The ROIS maintains the patient demographic information and
+identifiers used throughout the treatment course. In particular, the ROIS shall maintain a primary
+patient ID that serves as the reference identifier for the treatment course. This demographic and
+patient identifier information can be compiled via multiple pathways:
+  - Direct integration with a Hospital Information System (HIS) (typically via HL7 ADT or IHE PAM
+  interfaces).
+  - In imaging-driven workflows, by importing a planning CT or other imaging datasets that rely on
+  patient registration in a Radiology Information System (RIS).
+  - Through manual registration of the patient directly on the CT console, with the resulting image
+  dataset importing the demographics.
+  - Direct manual registration and entry of the patient within the ROIS itself.
+
+* **Encounter Management**: The ROIS maintains clinical and administrative encounter information.
+An encounter provides the administrative context within a patient's treatment course. Encounter
+information may be created within the ROIS or received from the Hospital Information System (HIS).
+
+* **Appointment Scheduling**: The ROIS creates and manages the appointment schedule for planned
+treatment fractions.
+
+* **Clinical Approvals**: The ROIS records clinical authorizations to proceed with treatment
+delivery.
+
+* **Centralized Progress Tracking**: The ROIS provides clinical users with a department-level view
+of scheduling, planning and delivery progress, and treatment history.
 
 FHIR Capability Statement for [ROIS](CapabilityStatement-IHE.SMRT.rois.html)
 
@@ -78,27 +115,137 @@ FHIR Capability Statement for [ROIS](CapabilityStatement-IHE.SMRT.rois.html)
 
 #### XX.1.1.2 Treatment Management System (TMS)
 
-The Sever processes query request from the Client actor.
+Within the context of the SMRT profile, the TMS coordinates treatment delivery execution and
+maintains the information required to prepare, manage, and document the delivery of treatment
+fractions. Its core responsibilities in this profile include:
+
+* **Treatment Fraction Management**: The TMS maintains the treatment fractions and prepares
+the corresponding treatment sessions for delivery, including management of interrupted,
+canceled, and partially delivered fractions.
+
+* **Treatment Plan Management**: The TMS imports, enriches, and maintains the treatment plans
+required for treatment delivery.
+
+* **Treatment Delivery Management**: The TMS coordinates and monitors treatment delivery
+activities associated with treatment sessions.
+
+* **Treatment Delivery Documentation**: The TMS maintains treatment delivery records and other
+treatment delivery artifacts.
 
 FHIR Capability Statement for [TMS](CapabilityStatement-IHE.SMRT.tms.html)
 
 <a name="ro-resource-repo"> </a>
 
-#### XX.1.1.3 Radiation Oncology Resource Repository (REPO)
+#### XX.1.1.3 Object Storage (OST)
 
-The Client queries for blah meeting certain criteria and may retrieve selected blah.
-
-FHIR Capability Statement for [REPO](CapabilityStatement-IHE.SMRT.repo.html)
+No specific descriptions or requirements.
 
 ### XX.1.2 Transaction Descriptions
 
 The transactions in this profile are summarized in the sections below.
 
-#### XX.1.2.1 Query Treatment Strategy ToDo do transaction
+This profile leverages existing IHE transactions based on HL7 V2 and defines additional
+transactions using HL7 V2, HL7 FHIR, and DICOM standards.
 
-This transaction is used to **do things**
+#### XX.1.2.1 Patient Identity Management [ITI-30]
 
-For more details see the detailed [transaction description](RO-SMRT-01.html)
+Standard: HL7 V2
+
+This profile reuses the Patient Identity Management [ITI-30] transaction defined in the
+Patient Administration Management (PAM) Profile.
+
+For more details see [ITI-30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html)
+
+#### XX.1.2.2 Patient Encounter Management [ITI-31]
+
+Standard: HL7 V2
+
+This profile reuses the Patient Encounter Management [ITI-31] transaction defined in the
+Patient Administration Management (PAM) Profile.
+
+For more details see [ITI-31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html)
+
+#### XX.1.2.3 Appointment Notification [RAD-48]
+
+Standard: HL7 V2
+
+This profile reuses the Appointment Notification [RAD-48] transaction defined in the
+Radiology Scheduled Workflow (SWF) Profile.
+
+For more details see [RAD TF-2](https://www.ihe.net/uploadedFiles/Documents/Radiology/IHE_RAD_TF_Vol2.pdf): 4.48.
+
+#### XX.1.2.4 Send Patient Photo [RO-SMRT-01]
+
+Standard: FHIR
+
+This transaction is used by the ROIS to provide the patient's photo to the TMS. The photo
+supports patient identification and verification activities during treatment delivery. The
+photo may be conveyed directly within the transaction or by reference for subsequent
+retrieval.
+
+For more details see the detailed [transaction description](RO-SMRT-01.html).
+
+#### XX.1.2.5 Report Planning Artifacts Ready [RO-SMRT-02]
+
+Standard: FHIR
+
+This transaction is used by the TMS to notify the ROIS that treatment planning artifacts are
+available for retrieval from the OST. Treatment planning artifacts represent information
+produced during treatment planning and include at least the treatment plan, structure sets,
+reference images, and dose information. The notification enables the ROIS to retrieve the
+artifacts required to maintain the treatment workflow record and support treatment progress
+tracking.
+
+For more details see the detailed [transaction description](RO-SMRT-02.html).
+
+#### XX.1.2.6 Retrieve Planning Artifacts [RO-SMRT-03]
+
+Standard: DICOM
+
+This transaction is used by the ROIS to retrieve treatment planning artifacts from the OST.
+
+For more details see the detailed [transaction description](RO-SMRT-03.html).
+
+#### XX.1.2.7 Report Delivery Artifacts Ready [RO-SMRT-04]
+
+Standard: FHIR
+
+This transaction is used by the TMS to notify the ROIS that treatment delivery artifacts are
+available for retrieval from the OST. Treatment delivery artifacts represent information
+prepared for treatment delivery, including the treatment plan enriched with treatment
+delivery parameters such as patient setup information and tolerance tables. The
+notification enables the ROIS to retrieve the artifacts required to maintain the treatment
+workflow record and support treatment progress tracking.
+
+For more details see the detailed [transaction description](RO-SMRT-04.html).
+
+#### XX.1.2.8 Retrieve Delivery Artifacts [RO-SMRT-05]
+
+Standard: DICOM
+
+This transaction is used by the ROIS to retrieve treatment delivery artifacts from the OST.
+
+For more details see the detailed [transaction description](RO-SMRT-05.html).
+
+#### XX.1.2.9 Report Session Artifacts Ready [RO-SMRT-06]
+
+Standard: FHIR
+
+This transaction is used by the TMS to notify the ROIS that treatment session artifacts are
+available for retrieval from the OST. Treatment session artifacts represent information
+produced during the treatment session and include at least the treatment record and
+procedure information. The notification enables the ROIS to retrieve the artifacts required
+to maintain the treatment workflow record and support treatment progress tracking.
+
+For more details see the detailed RO-SMRT-06.html.
+
+#### XX.1.2.10 Retrieve Session Artifacts [RO-SMRT-07]
+
+Standard: DICOM
+
+This transaction is used by the ROIS to retrieve treatment session artifacts from the OST.
+
+For more details see the detailed RO-SMRT-07.html.
 
 <a name="actor-options"> </a>
 
@@ -378,28 +525,24 @@ Guidance on using the "Grouping Condition" column:
 
 <a name="overview"> </a>
 
-## XX.4 ToDo Overview
+## XX.4 Shared Managament of Radiation Treatments Overview
 
-This section shows how the transactions/content modules of the profile
-are combined to address the use cases.
-
-Use cases are informative, not normative, and "SHALL" language is
-not allowed in use cases.
-
-<div>
-<img src="anImage.png" caption="Figure XX.4.1: Diagrammed in an image" width="70%" >
-</div>
+The Shared Managament of Radiation Treatments (SMRT) Profile [pronounced 'smart'] defines the
+transactions and content specifications necessary to connect any device-specific Treatment
+Management System (TMS) with a single departmental Radiation Oncology Information System (ROIS).
 
 ### XX.4.1 Concepts
 
-If needed, this section provides an overview of the concepts that
-provide necessary background for understanding the profile. If not
-needed, state "Not applicable." For an example of why/how this section
-may be needed, please see ITI Cross Enterprise Workflow (XDW).
+The SMRT profile operates within the broader context of a radiation oncology treatment center.
+It is expected that the Radiation Oncology Information System (ROIS) functions as the central
+management platform for oncology workflows, but it may rely on other systems such as a Hospital 
+Information System (HIS) or a Radiology Information System (RIS) when the department is integrated
+within a hospital.
 
-It may be useful in this section but is not necessary, to provide a
-short list of the use cases described below and explain why they are
-different.
+- **Patient Registration**: It is assumed that the ROIS actor has previously registered the patient
+and created the clinical encounter (utilizing the registration pathways described in Section XX.1.1.1)
+prior to initiating any SMRT transactions. SMRT transactions then synchronize this pre-existing
+demographic and encounter baseline down to the specialized TMS actor.
 
 ### XX.4.2 Use Cases
 
@@ -416,25 +559,7 @@ and a departmental ROIS. This baseline workflow focuses on the exchange of patie
 scheduling, and treatment-related artifacts. More advanced interactions, such as the direct
 exchange of prescription information, are considered optional extensions.
 
-The departmental ROIS is responsible for managing the patient's clinical journey and maintaining
-the authoritative record of the patient's treatment course. Its core responsibilities, as defined
-by this profile, are:
-
-- Patient and Schedule Management: It is responsible for synchronizing patient demographics and
-appointment information with the TMS to prepare it for the treatment workflow.
-- Treatment Approval: It is the system where clinical approval for treatment is given.
-It communicates this authorization to the TMS, serving as the gatekeeper for proceeding with
-treatment delivery.
-- Artifact Consolidation and Oversight: It provides a centralized point of access to all
-treatment-related artifacts. It receives notifications from the TMS when planning and treatment
-delivery artifacts are available, and it may selectively retrieve them as needed to provide
-a holistic view for clinical review and progress tracking and, optionally serve as the long-term
-archive for all retrieved data.
-Each device-specific TMS functions as a specialized subsystem for treatment execution.
-It is responsible for coordinating the treatment planning activities and for detailed management
-of the delivery of the treatment sessions on its associated device(s). It reports the status and
-results of these activities back to the ROIS, thereby contributing to the patient's authoritative
-treatment course record.
+The formal behavioral requirements and core responsibilities for the ROIS and TMS actors are detailed in Section XX.1.1.1 and Section XX.1.1.2 respectively. In this use case, the departmental ROIS manages the overall patient clinical journey, while the specialized TMS manages treatment planning and delivery, feeding status updates and treatment-related artifacts back to the ROIS to maintain a centralized patient record.
 
 ##### XX.4.2.1.2 Shared Management of Treatment Process Flow
 
@@ -444,7 +569,6 @@ treatment course record.
 </figure>
 <br clear="all"/>
 
-If process flow "swimlane" diagrams require additional explanation
 The process flow for this use case is initiated by the departmental ROIS, which is the central
 point of management for the patient's entire treatment journey.
 Patient Registration:
@@ -522,7 +646,7 @@ actor from a different profile.
 Modify the following "Swimlane Diagram". You can use plantuml or mermaid. see details on [using mermaid in the IG publisher](https://build.fhir.org/ig/FHIR/ig-guidance/diagrams-mermaid.html). Mermaid [user guide online](https://mermaid.js.org/intro/getting-started.html).  Plantuml seems more stable, and does support clickable links on artifacts. Goto [plantuml.com](http://plantuml.com) for an online tool to draft plantuml files.
 
 <figure>
-{% include usecase1-processflow.svg %}
+{% include usecase2-processflow.svg %}
 <figcaption><strong>XX.4.2.2-1: Basic Process Flow in SMRT Profile</strong></figcaption>
 </figure>
 <br clear="all"/>

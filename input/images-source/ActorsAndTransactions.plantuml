@@ -1,13 +1,19 @@
 @startuml
+!theme ihe-ro from ./themes
 ' with below line the SVG is not scaled/zoomed to fit the outer frame
 skinparam svgDimensionStyle true
 'skinparam linetype ortho
-skinparam linetype polyline
+skinparam linetype curved
 'skinparam ranksep 100
 'scale max 200 width 
-agent "[[#radiation-oncology-information-system Radiation Oncology Information System (ROIS)]]" as ROIS
-agent "[[#treatment-management-system Treatment Management System (TMS)]]" as TMS
-agent "[[#ro-resource-repo RO Resource Repo]]" as REPO
-TMS -down-> REPO : [[RO-SMRT-xx.html Subscribe ~[RO-SMRT-xx~]]] \n [[RO-SMRT-01.html Query Treatment Strategy ~[RO-SMRT-01~]]] \n [[RO-SMRT-02.html Query Diagnosis ~[RO-SMRT-02~]]]
-ROIS -down-> REPO : [[RO-SMRT-xx.html Subscribe ~[RO-SMRT-xx~]]] \n [[RO-SMRT-xx.html Report Approval ~[RO-SMRT-xx~]]]
+skinparam defaultTextAlignment left
+
+agent "Radiation Oncology Information System\n(ROIS)" as ROIS
+agent "Treatment Management System\n(TMS)" as TMS
+agent "RO Storage\n(OST)" as OST
+
+ROIS -- TMS: ↓ Patient Identity Management [ITI-30]\n↓ Patient Encounter Management [ITI-31]\n↓ Send Patient Photo [RO-SMRT-01]\n↓ Appointment Notification [RAD-48]\n↓ Report Approval [RO-SMRT-03]\n↑ Report Planning Artifacts Ready [RO-SMRT-02]\n↑ Report Delivery Artifacts Ready [RO-SMRT-04]\n↑ Report Session Artifacts Ready [RO-SMRT-05]
+
+ROIS -- OST: ↓ Retrieve Planning Artifacts [RO-SMRT-06]\n↓ Retrieve Delivery Artifacts [RO-SMRT-07]\n↓ Retrieve Session Artifacts [RO-SMRT-08]
+
 @enduml

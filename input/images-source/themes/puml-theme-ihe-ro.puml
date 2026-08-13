@@ -49,6 +49,18 @@ root {
   BackgroundColor $WHITE
 }
 
+agent {
+  BackgroundColor $IHE_PURPLE_10
+  LineColor $IHE_PURPLE_80
+  LineThickness 1
+  FontColor $IHE_PURPLE_80
+  FontStyle normal
+  FontSize 12
+  RoundCorner 2
+  Padding 10 15
+  Margin 5 30
+}
+
 sequenceDiagram {
 
   participant {
