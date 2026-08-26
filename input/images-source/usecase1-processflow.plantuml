@@ -28,8 +28,8 @@ ROIS -> OST : Retrieve Planning Artifacts [DICOM]
 ...
 == Treatment Delivery Preparation ==
 TMS -[#a8a8a8]> TMS : Enrich Plan for Delivery,\nPrepare Sessions,\nApprove Treatment
-TMS -> ROIS : Report Delivery Artifacts Ready [FHIR Message]
-ROIS -> OST : Retrieve Delivery Artifacts [DICOM]
+TMS -> ROIS : Report Deliverable Plan Artifact Ready [FHIR Message]
+ROIS -> OST : Retrieve Deliverable Plan Artifact [DICOM]
 ...
 == Treatment Delivery ==
 loop For each treatment session
@@ -43,8 +43,8 @@ loop For each treatment session
   end
 ...
   TMS -[#a8a8a8]> TMS : Manage Treatment Session Delivery
-  TMS -> ROIS : Report Treatment Session Artifacts Ready [FHIR Message]
-  ROIS -> OST : Retrieve Treatment Session Artifacts [DICOM]
+  TMS -> ROIS : Report Delivery Artifacts Ready [FHIR Message]
+  ROIS -> OST : Retrieve Delivery Artifacts [DICOM]
   ...
   ROIS -[#a8a8a8]> ROIS : Track Treatment Progress
   ||10||

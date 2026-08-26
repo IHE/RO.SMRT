@@ -8,12 +8,13 @@ For an optimal workflow, all treatment devices should be interfaced with the ROI
 scheduling, prescription management, and treatment progress monitoring to be performed directly
 within that single, centralized system.
 
-While some treatment devices can be managed by a Treatment Management System (TMS) integrated with
-the ROIS via the IHE-RO TDW-II profile, many others interface exclusively with a device-specific
-TMS or contain an integrated TMS. This is increasingly common with the emergence of treatment
-devices for novel techniques like Online Adaptive Radiation Therapy (OART), which utilizes imaging
-such as CBCT, CT, or MRI, and PET-based Dose-Guided Radiation Therapy (DGRT), which often bundle
-the TMS, Treatment Planning System (TPS), and TDD actors.
+While some treatment devices interact with a Treatment Management System (TMS) integrated with
+the ROIS via the IHE-RO TDW-II profile or any proprietary interface, many others connect
+exclusively with a device-specific TMS or have an integrated TMS.
+This is increasingly common with the emergence of treatment devices for novel techniques like
+Online Adaptive Radiation Therapy (OART), which utilizes imaging such as CBCT, CT, or MRI,
+and PET-based Dose-Guided Radiation Therapy (DGRT), which often bundle the TMS, Treatment Planning
+System (TPS), and TDD actors.
 
 These standalone TDDs are frequently disconnected from the departmental ROIS, creating isolated
 "islands" where treatments must be scheduled and tracked separately. This forces staff to rely on
@@ -47,28 +48,28 @@ in other related profiles are shown in dotted lines.
 
 <p id ="tXX.1-1" class="tableTitle"><strong>Table XX.1-1: SMRT Profile - Actors and Transactions</strong></p>
 
-| Actors  | Transactions                                 | Initiator or Responder | Optionality | Reference                                                             |
-|---------|----------------------------------------------|------------------------|-------------|-----------------------------------------------------------------------|
-| ROIS    | Patient Identity Management [ITI-30]         | Initiator              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
-|         | Patient Encounter Management [ITI-31]        | Initiator              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
-|         | Send Patient Photo [RO-SMRT-01]              | Initiator              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
-|         | Appointment Notification [RAD-48]            | Initiator              | R           | RAD TF-2: 4.48                                                        |
-|         | Report Planning Artifacts Ready [RO-SMRT-02] | Responder              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
-|         | Retrieve Planning Artifacts [RO-SMRT-03]     | Initiator              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
-|         | Report Delivery Artifacts Ready [RO-SMRT-04] | Responder              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
-|         | Retrieve Delivery Artifacts [RO-SMRT-05]     | Initiator              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
-|         | Report Session Artifacts Ready [RO-SMRT-06]  | Responder              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
-|         | Retrieve Session Artifacts [RO-SMRT-07]      | Initiator              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
-| TMS     | Patient Identity Management [ITI-30]         | Responder              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
-|         | Patient Encounter Management [ITI-31]        | Responder              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
-|         | Send Patient Photo [RO-SMRT-01]              | Responder              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
-|         | Appointment Notification [RAD-48]            | Responder              | R           | RAD TF-2: 4.48                                                        |
-|         | Report Planning Artifacts Ready [RO-SMRT-02] | Initiator              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
-|         | Report Delivery Artifacts Ready [RO-SMRT-04] | Initiator              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
-|         | Report Session Artifacts Ready [RO-SMRT-06]  | Initiator              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
-| OST     | Retrieve Planning Artifacts [RO-SMRT-03]     | Responder              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
-|         | Retrieve Delivery Artifacts [RO-SMRT-05]     | Responder              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
-|         | Retrieve Session Artifacts [RO-SMRT-07]      | Responder              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
+| Actors  | Transactions                                        | Initiator or Responder | Optionality | Reference                                                             |
+|---------|-----------------------------------------------------|------------------------|-------------|-----------------------------------------------------------------------|
+| ROIS    | Patient Identity Management [ITI-30]                | Initiator              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
+|         | Patient Encounter Management [ITI-31]               | Initiator              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
+|         | Send Patient Photo [RO-SMRT-01]                     | Initiator              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
+|         | Appointment Notification [RAD-48]                   | Initiator              | R           | RAD TF-2: 4.48                                                        |
+|         | Report Planning Artifacts Ready [RO-SMRT-02]        | Responder              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
+|         | Retrieve Planning Artifacts [RO-SMRT-03]            | Initiator              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
+|         | Report Deliverable Plan Artifact Ready [RO-SMRT-04] | Responder              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
+|         | Retrieve Deliverable Plan Artifact [RO-SMRT-05]     | Initiator              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
+|         | Report Delivery Artifacts Ready [RO-SMRT-06]        | Responder              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
+|         | Retrieve Delivery Artifacts [RO-SMRT-07]            | Initiator              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
+| TMS     | Patient Identity Management [ITI-30]                | Responder              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
+|         | Patient Encounter Management [ITI-31]               | Responder              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
+|         | Send Patient Photo [RO-SMRT-01]                     | Responder              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
+|         | Appointment Notification [RAD-48]                   | Responder              | R           | RAD TF-2: 4.48                                                        |
+|         | Report Planning Artifacts Ready [RO-SMRT-02]        | Initiator              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
+|         | Report Deliverable Plan Artifact Ready [RO-SMRT-04] | Initiator              | R           | [RO TF-2: 3.SMRT-04](./RO-SMRT-04.html)                               |
+|         | Report Delivery Artifacts Ready [RO-SMRT-06]        | Initiator              | R           | [RO TF-2: 3.SMRT-06](./RO-SMRT-06.html)                               |
+| OST     | Retrieve Planning Artifacts [RO-SMRT-03]            | Responder              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
+|         | Retrieve Deliverable Plan Artifact [RO-SMRT-05]     | Responder              | R           | [RO TF-2: 3.SMRT-05](./RO-SMRT-05.html)                               |
+|         | Retrieve Delivery Artifacts [RO-SMRT-07]            | Responder              | R           | [RO TF-2: 3.SMRT-07](./RO-SMRT-07.html)                               |
 {: .grid}
 
 ### XX.1.1 Actors
@@ -97,8 +98,13 @@ patient identifier information can be compiled via multiple pathways:
   - Direct manual registration and entry of the patient within the ROIS itself.
 
 * **Encounter Management**: The ROIS maintains clinical and administrative encounter information.
-An encounter provides the administrative context within a patient's treatment course. Encounter
-information may be created within the ROIS or received from the Hospital Information System (HIS).
+An encounter provides the administrative context within a patient's treatment course. It represents
+an episode of care under which radiation therapy activities are grouped. Within this profile, the
+encounter conveys key information such as whether the patient is an inpatient or outpatient, the 
+attending physician, and the relevant procedure code. This ensures treatments are properly
+associated with the correct episode of care for departmental tracking and billing.
+Encounter information may be created within the ROIS or received from the Hospital Information
+System (HIS).
 
 * **Appointment Scheduling**: The ROIS creates and manages the appointment schedule for planned
 treatment fractions.
@@ -134,7 +140,7 @@ treatment delivery artifacts.
 
 FHIR Capability Statement for [TMS](CapabilityStatement-IHE.SMRT.tms.html)
 
-<a name="ro-resource-repo"> </a>
+<a name="object-storage"> </a>
 
 #### XX.1.1.3 Object Storage (OST)
 
@@ -206,44 +212,43 @@ This transaction is used by the ROIS to retrieve treatment planning artifacts fr
 
 For more details see the detailed [transaction description](RO-SMRT-03.html).
 
-#### XX.1.2.7 Report Delivery Artifacts Ready [RO-SMRT-04]
+#### XX.1.2.7 Report Deliverable Plan Artifact Ready [RO-SMRT-04]
+
+Standard: FHIR
+
+This transaction is used by the TMS to notify the ROIS that the deliverable plan artifact is
+available for retrieval from the OST. The deliverable plan artifact is the treatment plan
+enriched with treatment delivery parameters, such as patient setup information and
+tolerance tables. The notification enables the ROIS to retrieve the artifact required to 
+maintain the treatment workflow record and support treatment progress tracking.
+
+For more details see the detailed [transaction description](RO-SMRT-04.html).
+
+#### XX.1.2.8 Retrieve Deliverable Plan Artifact [RO-SMRT-05]
+
+Standard: DICOM
+
+This transaction is used by the ROIS to retrieve the deliverable plan artifact from the OST.
+
+For more details see the detailed [transaction description](RO-SMRT-05.html).
+
+#### XX.1.2.9 Report Delivery Artifacts Ready [RO-SMRT-06]
 
 Standard: FHIR
 
 This transaction is used by the TMS to notify the ROIS that treatment delivery artifacts are
 available for retrieval from the OST. Treatment delivery artifacts represent information
-prepared for treatment delivery, including the treatment plan enriched with treatment
-delivery parameters such as patient setup information and tolerance tables. The
-notification enables the ROIS to retrieve the artifacts required to maintain the treatment
-workflow record and support treatment progress tracking.
-
-For more details see the detailed [transaction description](RO-SMRT-04.html).
-
-#### XX.1.2.8 Retrieve Delivery Artifacts [RO-SMRT-05]
-
-Standard: DICOM
-
-This transaction is used by the ROIS to retrieve treatment delivery artifacts from the OST.
-
-For more details see the detailed [transaction description](RO-SMRT-05.html).
-
-#### XX.1.2.9 Report Session Artifacts Ready [RO-SMRT-06]
-
-Standard: FHIR
-
-This transaction is used by the TMS to notify the ROIS that treatment session artifacts are
-available for retrieval from the OST. Treatment session artifacts represent information
 produced during the treatment session and include at least the treatment record and
 procedure information. The notification enables the ROIS to retrieve the artifacts required
 to maintain the treatment workflow record and support treatment progress tracking.
 
 For more details see the detailed RO-SMRT-06.html.
 
-#### XX.1.2.10 Retrieve Session Artifacts [RO-SMRT-07]
+#### XX.1.2.10 Retrieve Delivery Artifacts [RO-SMRT-07]
 
 Standard: DICOM
 
-This transaction is used by the ROIS to retrieve treatment session artifacts from the OST.
+This transaction is used by the ROIS to retrieve treatment delivery artifacts from the OST.
 
 For more details see the detailed RO-SMRT-07.html.
 
@@ -593,9 +598,9 @@ progress tracking.
 Treatment Approval:
 - When the plan is approved for delivery in the ROIS, the ROIS sends the approval to the TMS.
 - The TMS adds the approval to the plan.
-- The TMS then sends, to the ROIS, information about all treatment delivery artifacts which are
+- The TMS then sends, to the ROIS, information about the deliverable plan artifact which is
 ready for retrieval.
-- The ROIS retrieves, from the OST, the artifacts (e.g., RT Plan) which are required for treatment
+- The ROIS retrieves, from the OST, the artifact (e.g., RT Plan) which is required for treatment
 progress tracking.
 
 Treatment Delivery:
