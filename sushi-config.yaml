@@ -64,10 +64,10 @@ parameters:  # see https://confluence.hl7.org/display/FHIR/Implementation+Guide+
 pages:
 # itemize here each narrative page. Include assigned section numbers when appropriate. The order they appear here is the order they will appear in the TOC and on the next/prev navigation.
   index.md:
-    title: 1:XX Shared Management of Radiation Therapy (SMRT) Home
+    title: 1:XX Shared Management of Radiation Treatments (SMRT) Home
     generation: markdown
   volume-1.md:
-    title: 1:XX Shared Management of Radiation Therapy (SMRT) Volume 1
+    title: 1:XX Shared Management of Radiation Treatments (SMRT) Volume 1
     generation: markdown
   RO-SMRT-01.md:
     title: 2:3.YY Query Treatment Strategy [RO-SMRT-01]

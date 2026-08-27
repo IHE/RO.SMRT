@@ -1,42 +1,53 @@
 @startuml
-skinparam svgDimensionStyle true
+' Baseline SMRT Workflow
+!theme ihe-ro from ./themes
+title SMRT Baseline Workflow
 hide footbox
 
-actor "Clerk" as Clerk
-actor "Physician" as Physician
-actor "Planner" as Planner
-actor "Therapist" as Therapist
+participant ROIS
+participant TMS
+participant OST
 
-participant "Treatment Managament System" as TMS
-participant "RO Resource Repo" as REPO
-participant "Radiation Oncology Information System" as ROIS
-participant "Archive" as ARCH
+== Patient Registration ==
+ROIS -> TMS : Patient Identity Management [ITI-30]
+ROIS -> TMS : Patient Encounter Management [ITI-31]
+ROIS -> TMS : Send Patient Photo [FHIR Message]
+...
+ROIS -[#a8a8a8]> ROIS : Schedule Appointments
 
-activate "TMS"
-activate "ROIS"
-Clerk -> ROIS : //Register patient//
-Physician -> ROIS : //Enter diagnosis//
-TMS -> REPO : Query Patient [[RO-SMRT-xx.html RO-SMRT-xx]]
-TMS -> REPO : Query Treatment Strategy [[RO-SMRT-01.html RO-SMRT-01]]
-TMS -> REPO : Query Diagnosis [[RO-SMRT-xx.html RO-SMRT-xx]]
-Planner -> TMS : //Do detailed planning//
-Planner -> TMS : //Approve plan//
-TMS -> REPO : Report Planning Summary [[RO-SMRT-xx.html RO-SMRT-xx]]
-Physician -> ROIS : //Approve plan//
-ROIS -> REPO : Report Plan Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-Planner -> TMS : //Prepare plan for delivery//
-Planner -> TMS : //Approbe plan for delivery//
-TMS -> REPO : Report Treatment Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-Clerk -> ROIS : //Schedule appointments//
-ROIS -> REPO : Appointments scheduled [[RO-SMRT-xx.html RO-SMRT-xx]]
-Therapist -> TMS : //Start treatment session//
-TMS -> REPO : Report Treatment Session Status [[RO-SMRT-xx.html RO-SMRT-xx]]
-Therapist -> TMS : //Perform treatment session//
-Therapist -> TMS : //Close treatment session//
-TMS -> REPO : Report Treatment Session Status [[RO-SMRT-xx.html RO-SMRT-xx]]
-TMS -> REPO : Report Treatment Session Details [[RO-SMRT-xx.html RO-SMRT-xx]]
-Physician -> TMS : //Review and approve treatment session//
-TMS -> REPO : Report Treatment Session Approval [[RO-SMRT-xx.html RO-SMRT-xx]]
-deactivate "TMS"
-deactivate "ROIS"
+loop For each appointment
+  ||10||
+  ROIS -> TMS : Appointment Notification [RAD-48]
+  ||10||
+end
+...
+== Treatment Planning ==
+TMS -[#a8a8a8]> TMS : Import, Approve Treatment Plan
+TMS -> ROIS : Report Planning Artifacts Ready [FHIR Message]
+ROIS -> OST : Retrieve Planning Artifacts [DICOM]
+...
+== Treatment Delivery Preparation ==
+TMS -[#a8a8a8]> TMS : Enrich Plan for Delivery,\nPrepare Sessions,\nApprove Treatment
+TMS -> ROIS : Report Deliverable Plan Artifact Ready [FHIR Message]
+ROIS -> OST : Retrieve Deliverable Plan Artifact [DICOM]
+...
+== Treatment Delivery ==
+loop For each treatment session
+...
+  alt Patient Check-in
+    ROIS -> TMS : Appointment Notification [RAD-48]
+    note right of ROIS : SIU^S13 - Reschedule Bookings
+  else
+    TMS -> ROIS : Appointment Notification [RAD-48]
+    note left of TMS : SIU^S13 - Reschedule Bookings
+  end
+...
+  TMS -[#a8a8a8]> TMS : Manage Treatment Session Delivery
+  TMS -> ROIS : Report Delivery Artifacts Ready [FHIR Message]
+  ROIS -> OST : Retrieve Delivery Artifacts [DICOM]
+  ...
+  ROIS -[#a8a8a8]> ROIS : Track Treatment Progress
+  ||10||
+end
+
 @enduml
