@@ -22,7 +22,8 @@ This guide is organized into the following sections:
    1. [Cross Profile Considerations](volume-1.html#other-grouping)
    1. **TODO: point to the Volume 1 Appendix if there is one**
 2. Volume 2: Transaction Detail
-   1. [Query Treatment Strategy \[RO-SMRT-01\]](RO-SMRT-01.html)
+   1. [Send Patient Face Photo \[RO-SMRT-01\]](RO-SMRT-01.html)
+   1. [Report Planning Artifacts Ready \[RO-SMRT-02\]](RO-SMRT-02.html)
    1. **TODO: point to the Volume 2 Appendix if there is one**
 3. Volume 3: Metadata and Content
    1. [Content One](domain-ZZ.html)

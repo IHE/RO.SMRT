@@ -70,7 +70,10 @@ pages:
     title: 1:XX Shared Management of Radiation Treatments (SMRT) Volume 1
     generation: markdown
   RO-SMRT-01.md:
-    title: 2:3.YY Query Treatment Strategy [RO-SMRT-01]
+    title: 2:3.01 Send Patient Photo [RO-SMRT-01]
+    generation: markdown
+  RO-SMRT-02.md:
+    title: 2:4.02 Report Planning Artifacts Ready [RO-SMRT-02]
     generation: markdown
   domain-ZZ.md:
     title: 3:?.ZZ Content one [Domain-ZZ]
@@ -99,7 +102,8 @@ menu:
     Security Considerations: volume-1.html#security-considerations
     Cross-Profile Considerations: volume-1.html#other-grouping
   Volume 2:
-    "Query Treatment Strategy [RO-SMRT-01]": RO-SMRT-01.html
+    "Send Patient Face Photo [RO-SMRT-01]": RO-SMRT-01.html
+    "Report Planning Artifacts Ready [RO-SMRT-02]": RO-SMRT-02.html
   Volume 3:
     "Content one [Domain-ZZ]": domain-ZZ.html
   Artifacts: artifacts.html

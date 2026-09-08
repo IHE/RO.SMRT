@@ -52,7 +52,7 @@ in other related profiles are shown in dotted lines.
 |---------|-----------------------------------------------------|------------------------|-------------|-----------------------------------------------------------------------|
 | ROIS    | Patient Identity Management [ITI-30]                | Initiator              | R           | [ITI TF-2: 3.30](https://profiles.ihe.net/ITI/TF/Volume2/ITI-30.html) |
 |         | Patient Encounter Management [ITI-31]               | Initiator              | R           | [ITI TF-2: 3.31](https://profiles.ihe.net/ITI/TF/Volume2/ITI-31.html) |
-|         | Send Patient Photo [RO-SMRT-01]                     | Initiator              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
+|         | Send Patient Face Photo [RO-SMRT-01]                | Initiator              | R           | [RO TF-2: 3.SMRT-01](./RO-SMRT-01.html)                               |
 |         | Appointment Notification [RAD-48]                   | Initiator              | R           | RAD TF-2: 4.48                                                        |
 |         | Report Planning Artifacts Ready [RO-SMRT-02]        | Responder              | R           | [RO TF-2: 3.SMRT-02](./RO-SMRT-02.html)                               |
 |         | Retrieve Planning Artifacts [RO-SMRT-03]            | Initiator              | R           | [RO TF-2: 3.SMRT-03](./RO-SMRT-03.html)                               |
@@ -180,11 +180,11 @@ Radiology Scheduled Workflow (SWF) Profile.
 
 For more details see [RAD TF-2](https://www.ihe.net/uploadedFiles/Documents/Radiology/IHE_RAD_TF_Vol2.pdf): 4.48.
 
-#### XX.1.2.4 Send Patient Photo [RO-SMRT-01]
+#### XX.1.2.4 Send Patient Face Photo [RO-SMRT-01]
 
 Standard: FHIR
 
-This transaction is used by the ROIS to provide the patient's photo to the TMS. The photo
+This transaction is used by the ROIS to provide the patient's face photo to the TMS. The photo
 supports patient identification and verification activities during treatment delivery. The
 photo may be conveyed directly within the transaction or by reference for subsequent
 retrieval.
@@ -549,6 +549,154 @@ and created the clinical encounter (utilizing the registration pathways describe
 prior to initiating any SMRT transactions. SMRT transactions then synchronize this pre-existing
 demographic and encounter baseline down to the specialized TMS actor.
 
+#### XX.4.1.1 Messaging Framework
+
+##### Introduction
+
+This guide follows a simplified [FHIR messaging paradigm] for notifications employing both the FHIR Messaging Bundle and RESTful interaction using the [`$process-message`] operation for exchanging data.  Note that SMRT allows implementers to use only these FHIR messaging components in the same manner as a [FHIR RESTful operation] without having to fully implement the FHIR messaging framework.
+
+The following framework documents how to use [FHIR messaging] to define the contents of the notification and how to "push" these unrequested notification messages using the `$process-message` operation directly to Receivers.  The transactions in Volume 2 show how to implement the notification scenarios using the framework.
+
+This project recognizes the existing FHIR (R2-R4) subscriptions framework as well as  revisions to the *Subscription* resource for FHIR R5 for event based subscriptions using *SubscriptionTopic* and *SubscriptionStatus* and *Bundles* of type `subscription-notification`.  It is anticipated that an equivalent subscription based notification paradigm can be implemented as an alternate to the messaging based approach documented here.  After FHIR R5 subscription resources are finalized and an implementation guide to enable the implementation of R5-style subscription in FHIR F4 is completed, a future version of this guide will add subscriptions as an alternative workflow.
+{:.stu-note}
+
+##### Preconditions and Assumptions
+
+<div class="row">
+<div class="col-sm-6" markdown="1" style="background-color: Lightcyan;">
+**Preconditions**
+
+- There is an event or request that drives the generation of the Notification.
+- A Notification will be generated for each patient separately.
+  - The event can be for one or more patients.
+- The Sender has access to the Receiver FHIR endpoints.
+  - Typically the discovery and management of this is an 'out-of-band' process
+- System level trust exists between the actors (refer to the [Privacy, Safety, and Security] Page for additional guidance).
+  - Clients have been authorized by the servers.
+- A secure information transport mechanism exists between the actors (refer to the [Privacy, Safety, and Security] Page for additional guidance).
+
+----
+
+</div>
+<div class="col-sm-6" markdown = "1" style="background-color: WhiteSmoke;">
+**Assumptions**
+
+---
+
+- Based on FHIR R4 and US Core R4 profiles where applicable.
+- The Sender shall provide structured data whenever possible.
+- Notifications are transacted to the `$process-message` operation endpoint.
+- The SMRT Notification Message Bundle Profile is the FHIR object that is exchanged for all notification transactions.
+
+---
+
+</div>
+
+</div>
+<br/>
+
+##### The SMRT Notification Message Bundle
+
+For every notification, the object that is exchanged is a [FHIR message Bundle]. It consists of a Bundle identified by the type "message", with the first resource in the bundle being a [MessageHeader] resource. The MessageHeader resource has a code - the message event - that identifies the reason for the notification. The Receiver may use this event code to determine how to process the Notification.  The MessageHeader also carries additional notification metadata. The other resources in the bundle depend on the notification scenario and form a network through their relationships with each other - either through a direct reference to another resource or through a chain of intermediate references.
+
+###### The SMRT Notification Message Event Code
+
+The message event codes identify the purpose for the notification.  For this framework a set of concepts describing the purpose of the SMRT notification has been created.
+
+<!-- {% include list-simple-codesystems.xhtml %} -->
+
+###### What is in the Message Bundle
+
+The message bundle **SHALL** include the MessageHeader resource and the resources referenced by `MessageHeader.focus` element. It **SHOULD** include all resources needed for the Receiver to be able to process the message as expected by the the message event *provided that all included resources have a traversal path following Reference or canonical links either to or from the MessageHeader*.
+<!--See the [Admit/Discharge/Transfer Use Case] for an example of the required resources for a particular scenario.-->
+
+**Each Bundle must have:**
+
+1. *MessageHeader*
+1. The root resource referenced by `MessageHeader.focus`
+  - For example, the *Provenance* for an approval notification
+
+**Each Bundle must support:**
+
+1. *Organization* referenced by `MessageHeader.sender`
+1. US Core *Organization*, *Practitioner*, or *PractionerRole* referenced by `MessageHeader.responsible`
+1. US Core *Practitioner*, or *PractionerRole* referenced by `MessageHeader.author`
+    - This is the individual who authorized the event (e.g., the clinician who authorized the admit/discharge)
+1. *All* resources directly referenced by the `MessageHeader.focus` resource. The focal resource is use case dependent.  For example in an approval use case focal resource is the Provenance resource.
+
+   Implementers that use FHIR as their persistence layer may need to modify those resources before assembling the message bundle to avoid sending sensitive or unnecessary data.
+   {:.highlight-note}
+
+1.  *All* resources needed for the Receiver to be able to interpret the notification and process the message *provided* that the resources have a traversal path to or from `MessageHeader.focus` resource.  These requirements are use case specific.
+
+###### How to define the Message Bundle
+
+The set of resources within the message and their relationship to each other can be represented as an interconnected graph of resources as Figure 1 below illustrates (Note that this is a simplified and incomplete representation of the possible resources in notification message bundle; see [Report Planning Artifacts Ready](RO-SMRT-02.html) for a concrete example sceanrio):  
+
+<figure>
+{%include generic-message-graph.svg%}
+<figcaption><strong>Figure X.X.X.X-X: Generic Message Graph</strong></figcaption>
+</figure>
+<br clear="all"/>
+
+###### Formally Defining the SMRT Notification Message
+
+The SMRT Notification Message can be formally defined in FHIR using a set of FHIR Profiles that constrain links to the message Bundle. The base [SMRT Notifications MessageHeader Profile] and [SMRT Notifications Bundle Profile] are used to define the base constraints for all notification scenarios.
+
+All the profiles that populate the Bundle get enforced by their references and the [aggregation] element which is constrained to 'bundled'.  This means these references can only point to resources within the same bundle.  Therefore, starting with the MessageHeader profile, the profiled resources within the bundle form a chain of links that define the bundle.
+
+A use case specific Notification Bundle is defined by starting with base constraints in the [SMRT Notifications MessageHeader Profile] and [SMRT Notifications Bundle Profile] and creating a more tightly constrained MessageHeader Profile. Resources that are referenced within the Bundle are profiled to complete the Bundle definition.  Depending on the use case, existing profiles may be used or new profiles defined.
+
+See the Approval use case for an example of using FHIR Profiles to define the Bundle.
+
+[MessageDefinition] and [GraphDefinition] resources are an alternative to profiling the message bundle's contents. However, at the time of this publication, the implementation community, reference implementations, and validation tooling does not fully support them. FHIR profiling is the more mature mechanism broadly supported by the implementation community, reference implementations, and validation tooling. However, there is no mechanism to enforce profiles in a message on a reverse link because "reverse links" cannot be traversed forward from the MessageHeader. It may also require more artifacts than using MessageDefinition/GraphDefinition.
+{:.stu-note}
+
+##### Sending Notifications
+
+As shown in Figure 4, when an event or request triggers a notification, the Sender creates a Da Vinci Notification Message Bundle and notifies the Receiver or Intermediary using the `$process-message` operation.
+
+<figure>
+{%include process_message_wf.svg%}
+<figcaption><strong>Figure X.X.X.X-X: Sending SMRT Notification</strong></figcaption>
+</figure>
+<br clear="all"/>
+
+- For this guide there is no expectation for a notification response message to be returned from the Receiver to the Sender. Therefore, the $process-message input parameters "async" and "response-url" are not used and the body of this operation is the message bundle itself.
+- In the context of the `$process-message` operation, the Receiver is treated as a ["black box"] and simply accepts and processes the submitted data and there are no further expectations beyond the http level response as defined in the FHIR specification.
+  - The Receiver may sort and filter notifications based on the `MessageHeader.event` codes. For example, `notification-admit` can be used to filter for TODO notifications.
+- There is no expectation that the data submitted represents all the data required by the Notification Receiver, only that the data is known to be relevant to the triggering event.
+
+###### `$process-message` Operation
+
+The `$process-message` operation is invoked by the Sender using the `POST` syntax:
+
+`POST [base]/$process-message`
+
+The body of the operation is the SMRT Notification Message Bundle containing:
+
+  1. The MessageHeader which is the first resource in the bundle and contains the the message event code - that identifies the nature of the notification.
+  1. The other resources in the bundle depend on the notification use case and are defined by either the MessageDefinition and GraphDefinition or FHIR Profiles as described above.
+
+An HTTP Status success code is returned on successful submission.
+
+
+See the Approval scenario [Example Transactions] for an example of using the `$process-message` operation to send a SMRT Notification Message Bundle.
+
+###### Reliable Delivery
+
+Upon receiving a message, the Receiver may return one of several status codes which is documented in [`$process-message`] definition.  For successful transactions  `200`, `202`, or `204` **SHALL** be used. Using a `200` or `204` response to indicate the message is received and processable is preferred over `202` indicating the message is simply received.  If an error occurs, an [OperationOutcome] **SHOULD** be returned with details documenting the error. Parties should consider impact of failure to send and decide what additional steps to undertake. The following table defines the Sender behavior in response to the following error codes:
+
+|Error Code|Sender Behavior|
+|---|---|
+|`401`,`404` +/- OperationOutcome| do not attempt to resend the message without addressing the error|
+|`429` +/- OperationOutcome  |resend message but slow down traffic|
+|`500+` +/- OperationOutcome |may retry resending the message one or more times|
+{:.grid}
+
+Note that any mechanism of communicating an error *after* the Receiver has already responded to the Sender will be "out of band".  IF the message cannot be processed and thus the sender address cannot be obtained from the MessageHeader, the sender address could be discovered by inspection of other layers of transport such as is described by the [FHIR at Scale Taskforce (FAST)] authentication piece for server authorization.  See the messaging documentation in FHIR Specification for additional guidance on [reliable delivery].
+
+
 ### XX.4.2 Use Cases
 
 #### XX.4.2.1 Use Case \#1: Shared Management of Treatment
@@ -792,3 +940,6 @@ other profile acronym - other profile name
 A other profile actor name in other profile name might
 be grouped with a this profile actor name to describe
 benefit/what is accomplished by grouping.
+
+
+{% include link-list.md %}
