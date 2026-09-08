@@ -1,8 +1,7 @@
-Instance:   ex-patient
+Instance:   Patient1
 InstanceOf: Patient
 Title: "Example Patient"
-Description: "The patient from which all the example relate"
-// history - http://playgroundjungle.com/2018/02/origins-of-john-jacob-jingleheimer-schmidt.html
+Description: "The patient from which all the examples relate"
 * meta.security = http://terminology.hl7.org/CodeSystem/v3-ActReason#HTEST
 * name[+].use = #usual
 * name[=].family = "Schmidt"

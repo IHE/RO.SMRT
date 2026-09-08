@@ -1,4 +1,4 @@
----
+/'
 name: ihe-ro
 display_name: IHE International - Sequence Diagrams
 description: CSS-based theme for sequence diagrams using IHE International branding colors
@@ -8,7 +8,7 @@ license:
 version: 
 source: https://www.ihe.net/
 inspiration: IHE International corporate branding
----
+'/
 
 !$THEME = "ihe-ro"
 

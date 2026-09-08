@@ -1,0 +1,17 @@
+@startuml
+!theme ihe-ro from ./themes
+
+skinparam svgDimensionStyle true
+hide footbox
+participant "Sender" as Sender
+participant "Receiver" as Receiver
+activate Sender
+activate Receiver
+note over Sender : An event or request triggers a notification
+Sender -> Sender : Create SMRT Notification Message Bundle
+Sender -> Receiver : Initiate $process-message operation
+Receiver --> Sender : Response
+note over Receiver : Process SMRT Notification Message Bundle
+deactivate Sender
+deactivate Receiver
+@enduml
