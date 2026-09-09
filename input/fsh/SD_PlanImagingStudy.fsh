@@ -8,7 +8,7 @@ Description: "The SMRT Plan ImagingStudy Profile defines expectations for the FH
 * subject 1..1 MS
 * subject only Reference(Patient)
 * series 1..1 MS
-  * modality = DCM#RTPLAN
+  * modality = $DCM#RTPLAN
   * instance 0..* MS
     * uid MS
     * sopClass 1..1 MS
