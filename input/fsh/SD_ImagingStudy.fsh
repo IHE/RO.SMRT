@@ -12,7 +12,7 @@ Description: "The SMRT ImagingStudy Profile defines expectations for the FHIR Im
 * identifier contains StudyUID 1..1 MS
 * identifier[StudyUID] MS
 * identifier[StudyUID].type 1..1 MS
-* identifier[StudyUID].type = DCM#110180 "Study Instance UID"
+* identifier[StudyUID].type = $DCM#110180 "Study Instance UID"
 * identifier[StudyUID].system 1..1 MS
 * identifier[StudyUID].value 1..1 MS
 * status 1..1 MS
