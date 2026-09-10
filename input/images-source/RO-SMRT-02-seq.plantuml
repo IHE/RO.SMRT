@@ -3,12 +3,11 @@
 
 skinparam svgDimensionStyle true
 hide footbox
-
-participant "ROIS" as Sender
-participant "TMS" as Receiver
+participant "Sender" as Sender
+participant "Receiver" as Receiver
 activate Sender
 activate Receiver
-Sender -> Receiver : Send Patient Photo
+Sender -> Receiver : Initiates $process-message operation
 Receiver --> Sender : Response
 deactivate Sender
 deactivate Receiver
