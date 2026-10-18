@@ -10,8 +10,12 @@ Description: "The Planning Artifacts Notification MessageHeader Profile builds o
 * focus ^slicing.discriminator.type = #profile
 * focus ^slicing.discriminator.path = "$this.resolve()"
 * focus ^slicing.rules = #open
-* focus contains plan 1..1 MS and other 0..* MS
+* focus contains plan 1..1 MS and dose 1..1 MS and struct 1..1 MS and other 0..* MS
 * focus[plan] only Reference(PlanImagingStudy)
 * focus[plan] ^type.aggregation = #bundled
+* focus[dose] only Reference(DoseImagingStudy)
+* focus[dose] ^type.aggregation = #bundled
+* focus[struct] only Reference(StructImagingStudy)
+* focus[struct] ^type.aggregation = #bundled
 * focus[other] only Reference(SMRTImagingStudy)
 * focus[other] ^type.aggregation = #bundled
