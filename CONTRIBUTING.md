@@ -145,7 +145,7 @@ Use the following format:
 - Do not use spaces or underscores.
 - Keep names concise but descriptive.
 - Include an issue or Change Proposal identifier when useful.
-- Do not reuse a branch whose pull request has already been merged. Create a new branch from the current `main` branch for follow-up work.
+- Do not reuse a branch whose pull request has already been merged. Create a new branch from the current `master` branch for follow-up work.
 
 Examples:
 
@@ -182,7 +182,7 @@ IHE-RO adopted prefixes:
 - `SP-` for SearchParameters
 - `OP-` for OperationDefinitions
 - `INV-` for reusable invariants
-- `ALIAS-` for shared aliases
+- `AL-` for shared aliases
 - `MAP-` for mappings
 
 Examples:
@@ -195,7 +195,7 @@ VS-PlanApprovalActivity.fsh
 CS-ROWorkflowEvents.fsh
 EXT-TreatmentPlanReference.fsh
 CAP-TreatmentManagementSystem.fsh
-ALIAS-IHERO.fsh
+AL-IHERO.fsh
 ```
 
 If the repository already uses a more specific convention for a given artifact type, follow the established repository convention and keep the change internally consistent.
@@ -245,14 +245,14 @@ gh repo clone IHE/REPOSITORY
 cd REPOSITORY
 ```
 
-### 7.2 Update `main`
+### 7.2 Update `master`
 
-Always start new work from the latest `main` branch:
+Always start new work from the latest `master` branch:
 
 ```bash
-git switch main
+git switch master
 git fetch origin
-git pull --ff-only origin main
+git pull --ff-only origin master
 ```
 
 ### 7.3 Create a working branch
@@ -267,7 +267,7 @@ Example:
 git switch -c docs/update-contribution-guidelines
 ```
 
-Do not make contribution changes directly on `main`.
+Do not make contribution changes directly on `master`.
 
 ### 7.4 Make and review changes
 
@@ -323,13 +323,13 @@ git push
 ### 7.7 Create the pull request
 
 ```bash
-gh pr create --base main --fill
+gh pr create --base master --fill
 ```
 
 For incomplete work that is ready for early discussion:
 
 ```bash
-gh pr create --base main --fill --draft
+gh pr create --base master --fill --draft
 ```
 
 Open the pull request and CI links in a browser:
@@ -349,12 +349,12 @@ gh pr checks
 
 ### 8.1 Pull request is still open
 
-Update the existing branch from current `main`:
+Update the existing branch from current `master`:
 
 ```bash
 git switch <category>/<short-description>
 git fetch origin
-git rebase origin/main
+git rebase origin/master
 git push --force-with-lease
 ```
 
@@ -362,11 +362,11 @@ Use `--force-with-lease`, not `--force`.
 
 ### 8.2 Previous pull request has already been merged
 
-Treat the merged branch as complete. Create a new branch from the latest `main`, even when the follow-up change is related:
+Treat the merged branch as complete. Create a new branch from the latest `master`, even when the follow-up change is related:
 
 ```bash
-git switch main
-git pull --ff-only origin main
+git switch master
+git pull --ff-only origin master
 git switch -c <category>/<follow-up-description>
 ```
 
@@ -453,7 +453,7 @@ Suggested template:
 
 Before requesting review, confirm:
 
-- [ ] The branch was created from the current `main` branch.
+- [ ] The branch was created from the current `master` branch.
 - [ ] The change is linked to an issue or Change Proposal when appropriate.
 - [ ] The pull request contains one logically cohesive change.
 - [ ] Narrative and computable artifacts express the same requirement.
@@ -522,7 +522,7 @@ Confirm that:
 
 ### 11.5 IHE-RO reviewer expectations and repository approvals
 
-Repository branch-protection and `CODEOWNERS` settings determine the technically required approvals. In addition, substantial semantic changes should receive review from:
+Required approvals are determined by the repository's GitHub configuration. Where `CODEOWNERS` is used, it may identify reviewers responsible for specific parts of the IG. In addition, substantial semantic changes should receive review from:
 
 - at least one IHE-RO domain or workflow expert; and
 - at least one contributor familiar with FHIR profiling and IG publication.
@@ -576,13 +576,13 @@ Merge only when:
 - required checks pass;
 - blocking discussions are resolved;
 - the rendered build has been reviewed;
-- the change is ready for inclusion in `main`.
+- the change is ready for inclusion in `master`.
 
 After merge:
 
 ```bash
-git switch main
-git pull --ff-only origin main
+git switch master
+git pull --ff-only origin master
 git branch -d <category>/<short-description>
 ```
 
@@ -637,10 +637,10 @@ git mv old-name.md new-name.md
 ## 17. Compact everyday workflow
 
 ```bash
-# Update main
-git switch main
+# Update master
+git switch master
 git fetch origin
-git pull --ff-only origin main
+git pull --ff-only origin master
 
 # Create a focused branch
 git switch -c feature/short-description
@@ -657,7 +657,7 @@ git commit -m "Describe the change"
 git push -u origin HEAD
 
 # Create and inspect the PR
-gh pr create --base main --fill
+gh pr create --base master --fill
 gh pr checks
 gh pr view --web
 ```
