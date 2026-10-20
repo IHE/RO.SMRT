@@ -14,6 +14,7 @@
 ### Open Issues
 
 - ToDo_001: this is open issue 1
+- ToDo_002: this is open issue 2
 
 ### Closed Issues
 
